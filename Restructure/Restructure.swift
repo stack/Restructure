@@ -25,6 +25,51 @@ public class Restructure {
     internal let db: SQLiteDatabase
     private var isOpen: Bool
     
+    /// Get the last inserted ID in to the database
+    public var lastInsertedId: Int64 {
+        return sqlite3_last_insert_rowid(db)
+    }
+    
+    /// A number stored along with the database, typically used for schema versioning
+    public internal(set) var userVersion: Int {
+        get {
+            var statement: SQLiteStatement? = nil
+            var result = sqlite3_prepare_v2(db, "PRAGMA user_version", -1, &statement, nil)
+            
+            if result != SQLITE_OK {
+                let error = StructureError.from(result: result)
+                fatalError("Failed to prepare the get user_version statement: \(error)")
+            }
+            
+            guard let actualStatement = statement else {
+                fatalError("Prepared a get user_version statement, but no statement was given")
+            }
+            
+            defer {
+                sqlite3_finalize(actualStatement)
+            }
+            
+            result = sqlite3_step(actualStatement)
+            
+            if result != SQLITE_ROW {
+                let error = StructureError.from(result: result)
+                fatalError("Failed to step the user_version statement: \(error)")
+            }
+            
+            let version = sqlite3_column_int(statement, 0)
+            return Int(version)
+        }
+        
+        set {
+            let result = sqlite3_exec(db, "PRAGMA user_version = \(newValue)", nil, nil, nil)
+            
+            if result != SQLITE_OK {
+                let error = StructureError.from(result: result)
+                fatalError("Failed to set the user_version: \(error)")
+            }
+        }
+    }
+    
     
     // MARK: - Initialization
     
