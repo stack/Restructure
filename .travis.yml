@@ -3,12 +3,12 @@ language: objective-c
 os: osx
 osx_image: xcode10.1
 
-xcode_project: Structure.xcodeproj
+xcode_project: Restructure.xcodeproj
 
 xcode_scheme:
-    - Structure iOS
-    - Structure macOS
-    - Structure tvOS
+    - Restructure iOS
+    - Restructure macOS
+    - Restructure tvOS
 
 xcode_sdk:
     - iphonesimulator12.1
@@ -17,17 +17,17 @@ xcode_sdk:
 
 matrix:
     exclude:
-        - xcode_scheme: Structure iOS
+        - xcode_scheme: Restructure iOS
           xcode_sdk: macosx10.14
-        - xcode_scheme: Structure iOS
+        - xcode_scheme: Restructure iOS
           xcode_sdk: appletvsimulator12.1
-        - xcode_scheme: Structure macOS
+        - xcode_scheme: Restructure macOS
           xcode_sdk: iphonesimulator12.1
-        - xcode_scheme: Structure macOS
+        - xcode_scheme: Restructure macOS
           xcode_sdk: appletvsimulator12.1
-        - xcode_scheme: Structure tvOS
+        - xcode_scheme: Restructure tvOS
           xcode_sdk: iphonesimulator12.1
-        - xcode_scheme: Structure tvOS
+        - xcode_scheme: Restructure tvOS
           xcode_sdk: macosx10.14
 
 script:
