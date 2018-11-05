@@ -22,6 +22,9 @@ public class Restructure {
     
     // MARK: - Properties
     
+    /// The default date model used for all statements generated from this instance
+    public var dateMode: DateMode = .integer
+    
     internal let db: SQLiteDatabase
     private var isOpen: Bool
     
@@ -33,38 +36,26 @@ public class Restructure {
     /// A number stored along with the database, typically used for schema versioning
     public internal(set) var userVersion: Int {
         get {
-            var statement: SQLiteStatement? = nil
-            var result = sqlite3_prepare_v2(db, "PRAGMA user_version", -1, &statement, nil)
-            
-            if result != SQLITE_OK {
-                let error = StructureError.from(result: result)
-                fatalError("Failed to prepare the get user_version statement: \(error)")
+            do {
+                let statement = try prepare(query: "PRAGMA user_version")
+                let result = statement.step()
+                
+                switch result {
+                case let .row(row):
+                    return row[0]
+                default:
+                    fatalError("Failed to fetch user_version pragma from a result: \(result)")
+                }
+            } catch {
+                fatalError("Failed to fetching user_version pragma: \(error)")
             }
-            
-            guard let actualStatement = statement else {
-                fatalError("Prepared a get user_version statement, but no statement was given")
-            }
-            
-            defer {
-                sqlite3_finalize(actualStatement)
-            }
-            
-            result = sqlite3_step(actualStatement)
-            
-            if result != SQLITE_ROW {
-                let error = StructureError.from(result: result)
-                fatalError("Failed to step the user_version statement: \(error)")
-            }
-            
-            let version = sqlite3_column_int(statement, 0)
-            return Int(version)
         }
         
         set {
             let result = sqlite3_exec(db, "PRAGMA user_version = \(newValue)", nil, nil, nil)
             
             if result != SQLITE_OK {
-                let error = StructureError.from(result: result)
+                let error = RestructureError.from(result: result)
                 fatalError("Failed to set the user_version: \(error)")
             }
         }
@@ -74,21 +65,20 @@ public class Restructure {
     // MARK: - Initialization
     
     /**
-     Initializes a new Structure object with all data stored in memory. No data will be persisted.
+        Initializes a new Structure object with all data stored in memory. No data will be persisted.
      
-     - Throws: `StructureError.InternalError` if opening the database fails.
+        - Throws: `StructureError.InternalError` if opening the database fails.
      */
     convenience public init() throws {
         try self.init(path: ":memory:")
     }
     
     /**
-     Initializes a new Structure object at the given path. If the file already exists, it will be opened, otherwise it will be created.
+        Initializes a new Structure object at the given path. If the file already exists, it will be opened, otherwise it will be created.
      
-     - Parameters:
-     - path: The full path to the Structure object to open or create.
+        - Parameter path: The full path to the Structure object to open or create.
      
-     - Throws: `StructureError.InternalError` if opening the database fails.
+        - Throws: `StructureError.InternalError` if opening the database fails.
      */
     required public init(path: String) throws {
         // Build the database object
@@ -97,7 +87,7 @@ public class Restructure {
         
         // Check if it was successful
         if result != SQLITE_OK {
-            throw StructureError.from(result: result)
+            throw RestructureError.from(result: result)
         }
         
         // Sanily check that the database pointer got made
@@ -148,5 +138,50 @@ public class Restructure {
                 sqlite3_result_text(context, $0, Int32(stringValue.lengthOfBytes(using: .utf8)), SQLITE_STATIC)
             }
         }, nil, nil)
+    }
+    
+    // MARK: - Querying
+    
+    /**
+        Simply executes a statement with a success / failure result.
+ 
+        - Parameter query: The SQL statement to execute
+ 
+        - Throws: `StructureError.InternalError` if the execution failed.
+    */
+    
+    public func execute(query: String) throws {
+        var errorMessage: UnsafeMutablePointer<Int8>? = nil
+        let result = sqlite3_exec(db, query, nil, nil, &errorMessage)
+        
+        var potentialError: RestructureError? = nil
+        
+        if result != SQLITE_OK, let rawMessage = errorMessage {
+            if let message = String(validatingUTF8: rawMessage) {
+                potentialError = RestructureError.internalError(result, message)
+            }
+            
+            sqlite3_free(errorMessage)
+        }
+        
+        if let error = potentialError {
+            throw error
+        }
+    }
+    
+    /**
+        Prepare a new `Statement` for the database
+     
+        - Parameter query: The SQL statement to prepare
+     
+        - Throws: `StructureError.InternalError` if the statement cannot be parsed.
+     
+        - Returns: An unexecuted, unbound statement.
+     */
+    public func prepare(query: String) throws -> Statement {
+        let statement = try Statement(restructure: self, query: query)
+        statement.dateMode = dateMode
+        
+        return statement
     }
 }

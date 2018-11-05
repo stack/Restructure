@@ -8,3 +8,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 -   Created the primary `Restructure` object for maintaining SQLite databases.
+-   Created the `Statement` object for working with prepared SQLite statements.
+-   Created the `Row` object for working with resultant rows from a `Statement`.

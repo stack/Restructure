@@ -11,69 +11,18 @@ import XCTest
 
 class RestructureTests: XCTestCase {
     
-    var restructure: Restructure? = nil
-    var tempPath: String = ""
+    var restructure: Restructure!
 
     override func setUp() {
-        let baseURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-        let tempURL = baseURL.appendingPathComponent("Restructure Tests.db")
-        tempPath = tempURL.path
-        
-        let manager = FileManager.default
-        
-        if manager.fileExists(atPath: tempPath) {
-            try! manager.removeItem(atPath: tempPath)
-        }
+        restructure = try! Restructure()
     }
 
     override func tearDown() {
-        if let restructure = restructure {
-            restructure.close()
-            self.restructure = nil
-        }
-        
-        let manager = FileManager.default
-        
-        if manager.fileExists(atPath: tempPath) {
-            try! manager.removeItem(atPath: tempPath)
-        }
-    }
-    
-    func testCreateInMemoryWorks() {
-        do {
-            restructure = try Restructure()
-        } catch {
-            XCTFail("Building in memory restructure failed: \(error)")
-        }
-        
-        XCTAssertNotNil(restructure)
-    }
-    
-    func testCreateFileWorks() {
-        do {
-            restructure = try Restructure(path: tempPath)
-        } catch {
-            XCTFail("Build file-backed restructure failed: \(error)")
-        }
-        
-        XCTAssertNotNil(restructure)
-    }
-    
-    func testCreateExistingFileWorks() {
-        // Build the first time
-        restructure = try! Restructure(path: tempPath)
-        restructure!.close()
+        restructure.close()
         restructure = nil
-        
-        // Attempt to run again
-        do {
-            restructure = try Restructure(path: tempPath)
-        } catch {
-            XCTFail("Build file-backed restructure again failed: \(error)")
-        }
-        
-        XCTAssertNotNil(restructure)
     }
+    
+    // MARK: - User Version Tests
     
     func testUserVersionStartsAtZero() {
         restructure = try! Restructure()
@@ -85,5 +34,42 @@ class RestructureTests: XCTestCase {
         restructure!.userVersion = 42
         
         XCTAssertEqual(restructure!.userVersion, 42)
+    }
+    
+    
+    // MARK: - Execution Tests
+    
+    func testExecutingInvalidQuery() {
+        XCTAssertThrowsError(try restructure.execute(query: "FOO BAR BAZ"))
+    }
+    
+    func testExecutingValidQuery() {
+        XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INT)"))
+    }
+    
+    func testExecutingMultipleValidQueries() {
+        XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INT); INSERT INTO foo (a) VALUES(42);"))
+        
+        let statement = try! restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
+        let result = statement.step()
+        
+        switch result {
+        case let .row(row):
+            XCTAssertEqual(row["a"], 42)
+        default:
+            XCTFail("Failed to get a row")
+        }
+    }
+    
+    
+    // MARK: - Last Inserted ID Tests
+    
+    func testLastInsertedIdReturnsZeroWithNoInserts() {
+        XCTAssertEqual(0, restructure.lastInsertedId)
+    }
+    
+    func testLastInsertedIdReturnsNonZeroWithInserts() {
+        XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b INT); INSERT INTO foo (b) VALUES(42);"))
+        XCTAssertGreaterThan(restructure.lastInsertedId, 0)
     }
 }

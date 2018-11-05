@@ -9,11 +9,15 @@
 import Foundation
 import SQLite3
 
-public enum StructureError: Error {
+/// The error container for all Resturcture errors
+public enum RestructureError: Error {
+    /// An error unrelated to SQLite
     case error(String)
+    
+    /// An error related to SQLite
     case internalError(Int32, String)
     
-    internal static func from(result: Int32) -> StructureError {
+    internal static func from(result: Int32) -> RestructureError {
         if let message = String.from(sqliteResult: result) {
             return internalError(result, message)
         } else {
