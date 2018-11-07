@@ -250,3 +250,28 @@ public class Statement {
     }
     
 }
+
+extension Statement: Sequence {
+    public func makeIterator() -> StatementIterator {
+        return StatementIterator(self)
+    }
+}
+
+public struct StatementIterator: IteratorProtocol {
+    private let statement: Statement
+    
+    fileprivate init(_ statement: Statement) {
+        self.statement = statement
+    }
+    
+    public mutating func next() -> Row? {
+        let result = statement.step()
+        
+        switch result {
+        case let .row(row):
+            return row
+        default:
+            return nil
+        }
+    }
+}

@@ -82,6 +82,9 @@
 		D13D056D218FE74D0073F184 /* DateMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13D0569218FE74D0073F184 /* DateMode.swift */; };
 		D13D056E218FE74D0073F184 /* DateMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13D0569218FE74D0073F184 /* DateMode.swift */; };
 		D13D056F218FE74D0073F184 /* DateMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13D0569218FE74D0073F184 /* DateMode.swift */; };
+		D13D057121929A010073F184 /* StatementSequenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13D057021929A010073F184 /* StatementSequenceTests.swift */; };
+		D13D057221929A010073F184 /* StatementSequenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13D057021929A010073F184 /* StatementSequenceTests.swift */; };
+		D13D057321929A010073F184 /* StatementSequenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13D057021929A010073F184 /* StatementSequenceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +144,7 @@
 		D13D055E218FD7800073F184 /* RowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowTests.swift; sourceTree = "<group>"; };
 		D13D0562218FE17F0073F184 /* Date+Julian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Julian.swift"; sourceTree = "<group>"; };
 		D13D0569218FE74D0073F184 /* DateMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateMode.swift; sourceTree = "<group>"; };
+		D13D057021929A010073F184 /* StatementSequenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatementSequenceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,6 +236,7 @@
 				D13D055A218FC45E0073F184 /* RestructureInitializationTests.swift */,
 				D13D04DE218DF34B0073F184 /* RestructureTests.swift */,
 				D13D055E218FD7800073F184 /* RowTests.swift */,
+				D13D057021929A010073F184 /* StatementSequenceTests.swift */,
 				D13D0552218FB8C70073F184 /* StatementTests.swift */,
 				D13D0556218FBAA60073F184 /* TestHelpers.swift */,
 			);
@@ -561,6 +566,7 @@
 			files = (
 				D13D055F218FD7800073F184 /* RowTests.swift in Sources */,
 				D13D0538218E430D0073F184 /* Statement.swift in Sources */,
+				D13D057121929A010073F184 /* StatementSequenceTests.swift in Sources */,
 				D13D0557218FBAA60073F184 /* TestHelpers.swift in Sources */,
 				D13D04D7218DDF640073F184 /* Restructure.swift in Sources */,
 				D13D053F218E4BC70073F184 /* Bindable.swift in Sources */,
@@ -598,6 +604,7 @@
 			files = (
 				D13D0560218FD7800073F184 /* RowTests.swift in Sources */,
 				D13D053A218E430D0073F184 /* Statement.swift in Sources */,
+				D13D057221929A010073F184 /* StatementSequenceTests.swift in Sources */,
 				D13D0558218FBAA60073F184 /* TestHelpers.swift in Sources */,
 				D13D0531218DF6A70073F184 /* RestructureTests.swift in Sources */,
 				D13D0541218E4BC70073F184 /* Bindable.swift in Sources */,
@@ -635,6 +642,7 @@
 			files = (
 				D13D0561218FD7800073F184 /* RowTests.swift in Sources */,
 				D13D053C218E430D0073F184 /* Statement.swift in Sources */,
+				D13D057321929A010073F184 /* StatementSequenceTests.swift in Sources */,
 				D13D0559218FBAA60073F184 /* TestHelpers.swift in Sources */,
 				D13D0532218DF6A80073F184 /* RestructureTests.swift in Sources */,
 				D13D0543218E4BC70073F184 /* Bindable.swift in Sources */,
