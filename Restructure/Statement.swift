@@ -143,7 +143,7 @@ public class Statement {
         - Remark:
             Bindable indexes start at 1, not 0.
     */
-    public func bind(value: Bindable?, at index: Int32) {
+    public func bind(value: Structurable?, at index: Int32) {
         precondition(index > 0)
         
         // If we didn't get a value, bind NULL.
@@ -209,7 +209,7 @@ public class Statement {
         Bindable indexes start at 1, not 0.
         Bindable names start with ':', '@', or '$' when the statement is prepared. They are referenced here without the prefix.
      */
-    public func bind(value: Bindable?, for key: String) {
+    public func bind(value: Structurable?, for key: String) {
         // Ensure we can map a parameter to an index
         guard let index = bindables[key] else {
             return
