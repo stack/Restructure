@@ -188,29 +188,17 @@ class StatementTests: XCTestCase {
             return
         }
         
-        let aString: Int64 = row["a"]
-        let bString: String? = row["b"]
-        let cString: Double = row["c"]
-        let dString: Int = row["d"]
-        let eString: Data? = row["e"]
+        let aValue: Int64 = row["a"]
+        let bValue: String? = row["b"]
+        let cValue: Double? = row["c"]
+        let dValue: Int? = row["d"]
+        let eValue: Data? = row["e"]
         
-        XCTAssertEqual(lastId, aString)
-        XCTAssertNil(bString)
-        XCTAssertEqual(0.0, cString)
-        XCTAssertEqual(0, dString)
-        XCTAssertNil(eString)
-        
-        let aInt: Int64 = row[0]
-        let bInt: String? = row[1]
-        let cInt: Double = row[2]
-        let dInt: Int = row[3]
-        let eInt: Data? = row[4]
-        
-        XCTAssertEqual(lastId, aInt)
-        XCTAssertNil(bInt)
-        XCTAssertEqual(0.0, cInt)
-        XCTAssertEqual(0, dInt)
-        XCTAssertNil(eInt)
+        XCTAssertEqual(lastId, aValue)
+        XCTAssertNil(bValue)
+        XCTAssertNil(cValue)
+        XCTAssertNil(dValue)
+        XCTAssertNil(eValue)
     }
     
     func testUpdateStatement() {
