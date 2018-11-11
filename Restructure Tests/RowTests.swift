@@ -26,6 +26,41 @@ class RowTests: XCTestCase {
         restructure = nil
     }
     
+    // MARK: - Boolean Tests
+    
+    func testBool() {
+        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        
+        insertStatement.bind(value: false, for: "a")
+        insertStatement.bind(value: 0, for: "p")
+        _ = insertStatement.step()
+        
+        insertStatement.reset()
+        
+        insertStatement.bind(value: true, for: "a")
+        insertStatement.bind(value: 0, for: "p")
+        _ = insertStatement.step()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        
+        guard case let .row(row1) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        let value1: Bool = row1["a"]
+        XCTAssertFalse(value1)
+        
+        guard case let .row(row2) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        let value2: Bool = row2["a"]
+        XCTAssertTrue(value2)
+    }
+    
     
     // MARK: - Signed Integer Tests
     

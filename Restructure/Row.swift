@@ -35,6 +35,9 @@ public class Row {
         
         // Convert to the proper type
         switch T.self {
+        case is Bool.Type:
+            let value = sqlite3_column_int(statement.statement, index)
+            return (value != 0) as! T
         case is Int.Type:
             let value = sqlite3_column_int64(statement.statement, index)
             return Int(value) as! T

@@ -154,6 +154,8 @@ public class Statement {
         
         // Bind the appropriate type
         switch bindable {
+        case let x as Bool:
+            sqlite3_bind_int(statement, index, x ? 1 : 0)
         case let x as Int:
             sqlite3_bind_int64(statement, index, Int64(x))
         case let x as Int8:

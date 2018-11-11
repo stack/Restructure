@@ -11,6 +11,8 @@ import Foundation
 /// An empty protocol to define which data type can be bound to
 public protocol Structurable { }
 
+extension Bool: Structurable { }
+
 extension Int: Structurable { }
 extension Int8: Structurable { }
 extension Int16: Structurable { }
