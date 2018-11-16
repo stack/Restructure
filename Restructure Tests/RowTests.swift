@@ -499,6 +499,88 @@ class RowTests: XCTestCase {
     }
     
     
+    // MARK: - Array Tests
+    
+    func testArrayBinaryPList() {
+        restructure.arrayStrategy = .bplist
+        
+        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        
+        insertStatement.bind(value: [1, 2, 3], for: "a")
+        insertStatement.bind(value: 0, for: "p")
+        _ = insertStatement.step()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        
+        guard case let .row(row) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["a"], [1, 2, 3])
+    }
+    
+    func testArrayJSON() {
+        restructure.arrayStrategy = .json
+        
+        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        
+        insertStatement.bind(value: [1, 2, 3], for: "a")
+        insertStatement.bind(value: 0, for: "p")
+        _ = insertStatement.step()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        
+        guard case let .row(row) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["a"], [1, 2, 3])
+    }
+    
+    func testMultiDimensionalArrayBinaryPList() {
+        restructure.arrayStrategy = .bplist
+        
+        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        
+        insertStatement.bind(value: [[1.0, 2.0, 3.0]], for: "a")
+        insertStatement.bind(value: 0, for: "p")
+        _ = insertStatement.step()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        
+        guard case let .row(row) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["a"], [[1.0, 2.0, 3.0]])
+    }
+    
+    func testMultiDimensionalArrayJSON() {
+        restructure.arrayStrategy = .json
+        
+        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        
+        insertStatement.bind(value: [[1.0, 2.0, 3.0]], for: "a")
+        insertStatement.bind(value: 0, for: "p")
+        _ = insertStatement.step()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        
+        guard case let .row(row) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["a"], [[1.0, 2.0, 3.0]])
+    }
+    
     // MARK: - Real Tests
     
     func testFloat() {
@@ -628,7 +710,7 @@ class RowTests: XCTestCase {
         try! restructure.execute(query: "CREATE TABLE foo (a INT)")
         
         let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
-        insertStatement.dateMode = .integer
+        insertStatement.dateStrategy = .integer
         insertStatement.bind(value: now, for: "a")
         _ = insertStatement.step()
         
@@ -651,12 +733,12 @@ class RowTests: XCTestCase {
         try! restructure.execute(query: "CREATE TABLE foo (a REAL)")
         
         let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
-        insertStatement.dateMode = .real
+        insertStatement.dateStrategy = .real
         insertStatement.bind(value: now, for: "a")
         _ = insertStatement.step()
         
         let selectStatement = try! restructure.prepare(query: "SELECT a from foo LIMIT 1")
-        selectStatement.dateMode = .real
+        selectStatement.dateStrategy = .real
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -675,12 +757,12 @@ class RowTests: XCTestCase {
         try! restructure.execute(query: "CREATE TABLE foo (a TEXT)")
         
         let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
-        insertStatement.dateMode = .text
+        insertStatement.dateStrategy = .text
         insertStatement.bind(value: now, for: "a")
         _ = insertStatement.step()
         
         let selectStatement = try! restructure.prepare(query: "SELECT a from foo LIMIT 1")
-        selectStatement.dateMode = .text
+        selectStatement.dateStrategy = .text
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")

@@ -18,6 +18,16 @@ class StatementEncoderTests: XCTestCase {
         let d: Int
         let e: Data
     }
+    
+    struct FooWithArray: Encodable {
+        let a: Int64?
+        let e: [Int]
+    }
+    
+    struct FooWithMultiArray: Encodable {
+        let a: Int64?
+        let e: [[Int]]
+    }
 
     var restructure: Restructure!
     
@@ -60,5 +70,61 @@ class StatementEncoderTests: XCTestCase {
         XCTAssertEqual(row["c"], 2.0)
         XCTAssertEqual(row["d"], 3)
         XCTAssertEqual(row["e"], Data(bytes: [0x4, 0x5, 0x6], count: 3))
+    }
+    
+    func testArrayEncodable() {
+        let statement = try! restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
+        
+        let foo = FooWithArray(a: nil, e: [1, 2, 3])
+        
+        let encoder = StatementEncoder()
+        
+        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        
+        var result = statement.step()
+        
+        guard case .done = result else {
+            XCTFail("Failed to insert data")
+            return
+        }
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
+        
+        result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["e"], [1, 2, 3])
+    }
+    
+    func testMultiArrayEncodable() {
+        let statement = try! restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
+        
+        let foo = FooWithMultiArray(a: nil, e: [[1, 2, 3]])
+        
+        let encoder = StatementEncoder()
+        
+        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        
+        var result = statement.step()
+        
+        guard case .done = result else {
+            XCTFail("Failed to insert data")
+            return
+        }
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
+        
+        result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["e"], [[1, 2, 3]])
     }
 }

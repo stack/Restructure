@@ -1,5 +1,5 @@
 //
-//  DateMode.swift
+//  DateStrategy.swift
 //  Restructure
 //
 //  Created by Stephen H. Gerstacker on 11/4/18.
@@ -8,8 +8,8 @@
 
 import Foundation
 
-/// The model used when reading and writing dates
-public enum DateMode {
+/// The strategy used when reading and writing dates
+public enum DateStrategy {
     /// Dates are stored as seconds from January 1, 1970
     case integer
     /// Dates are stored in Julian days since January 1, 4713 BC

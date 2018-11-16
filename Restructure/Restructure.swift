@@ -22,8 +22,11 @@ public class Restructure {
     
     // MARK: - Properties
     
-    /// The default date model used for all statements generated from this instance
-    public var dateMode: DateMode = .integer
+    /// The default array strategy used for all statements generated from this instance
+    public var arrayStrategy: ArrayStrategy = .bplist
+    
+    /// The default date strategy used for all statements generated from this instance
+    public var dateStrategy: DateStrategy = .integer
     
     internal let db: SQLiteDatabase
     private var isOpen: Bool
@@ -180,7 +183,8 @@ public class Restructure {
      */
     public func prepare(query: String) throws -> Statement {
         let statement = try Statement(restructure: self, query: query)
-        statement.dateMode = dateMode
+        statement.arrayStrategy = arrayStrategy
+        statement.dateStrategy = dateStrategy
         
         return statement
     }

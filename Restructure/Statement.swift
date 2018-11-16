@@ -21,7 +21,8 @@ public class Statement {
     internal var bindables: [String:Int32] = [:]
     internal var columns: [String:Int32] = [:]
     
-    public var dateMode: DateMode = .integer
+    public var arrayStrategy: ArrayStrategy = .bplist
+    public var dateStrategy: DateStrategy = .integer
     
     public var bindableNames: [String] {
         return Array(bindables.keys)
@@ -152,54 +153,8 @@ public class Statement {
             return
         }
         
-        // Bind the appropriate type
-        switch bindable {
-        case let x as Bool:
-            sqlite3_bind_int(statement, index, x ? 1 : 0)
-        case let x as Int:
-            sqlite3_bind_int64(statement, index, Int64(x))
-        case let x as Int8:
-            sqlite3_bind_int(statement, index, Int32(x))
-        case let x as Int16:
-            sqlite3_bind_int(statement, index, Int32(x))
-        case let x as Int32:
-            sqlite3_bind_int(statement, index, x)
-        case let x as Int64:
-            sqlite3_bind_int64(statement, index, x)
-        case let x as UInt:
-            sqlite3_bind_int64(statement, index, Int64(bitPattern: UInt64(x)))
-        case let x as UInt8:
-            sqlite3_bind_int(statement, index, Int32(bitPattern: UInt32(x)))
-        case let x as UInt16:
-            sqlite3_bind_int(statement, index, Int32(bitPattern: UInt32(x)))
-        case let x as UInt32:
-            sqlite3_bind_int64(statement, index, Int64(bitPattern: UInt64(x)))
-        case let x as Float:
-            sqlite3_bind_double(statement, index, Double(x))
-        case let x as Double:
-            sqlite3_bind_double(statement, index, x)
-        case let x as Data:
-            x.withUnsafeBytes { data -> Void in
-                sqlite3_bind_blob(statement, index, data, Int32(x.count), SQLITE_TRANSIENT)
-            }
-        case let x as Date:
-            switch dateMode {
-            case .integer:
-                let time = x.timeIntervalSince1970
-                sqlite3_bind_int64(statement, index, Int64(time))
-            case .real:
-                let time = x.julianDays
-                sqlite3_bind_double(statement, index, time)
-            case .text:
-                let formatter = ISO8601DateFormatter()
-                let time = formatter.string(from: x)
-                sqlite3_bind_text(statement, index, time, Int32(time.utf8.count), SQLITE_TRANSIENT)
-            }
-        case let x as String:
-            sqlite3_bind_text(statement, index, x, Int32(x.utf8.count), SQLITE_TRANSIENT)
-        default:
-            fatalError("Unhandled bindable type: \(bindable.self)")
-        }
+        // Bind the value
+        bindable.bind(to: self, at: Int(index))
     }
     
     /**
