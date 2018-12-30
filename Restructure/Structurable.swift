@@ -11,7 +11,6 @@ import SQLite3
 
 /// Defines the types that can be converted to and from a SQLite value.
 public protocol Structurable {
-    
     static func from(_ statement: Statement, at index: Int) -> Self
     func bind(to statement: Statement, at index: Int)
 }

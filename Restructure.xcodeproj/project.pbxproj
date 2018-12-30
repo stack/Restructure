@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D111A4CD21B22C6000F84FE2 /* RowDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D111A4CC21B22C6000F84FE2 /* RowDecoderTests.swift */; };
+		D111A4CE21B22C6000F84FE2 /* RowDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D111A4CC21B22C6000F84FE2 /* RowDecoderTests.swift */; };
+		D111A4CF21B22C6000F84FE2 /* RowDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D111A4CC21B22C6000F84FE2 /* RowDecoderTests.swift */; };
 		D1126083219709EA0041463A /* StatementEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126082219709EA0041463A /* StatementEncoder.swift */; };
 		D1126084219709EA0041463A /* StatementEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126082219709EA0041463A /* StatementEncoder.swift */; };
 		D1126085219709EA0041463A /* StatementEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126082219709EA0041463A /* StatementEncoder.swift */; };
@@ -22,6 +25,12 @@
 		D11260912197CAD60041463A /* ArrayStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D112608D2197CAD60041463A /* ArrayStrategy.swift */; };
 		D11260922197CAD60041463A /* ArrayStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D112608D2197CAD60041463A /* ArrayStrategy.swift */; };
 		D11260932197CAD60041463A /* ArrayStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D112608D2197CAD60041463A /* ArrayStrategy.swift */; };
+		D1126095219E42950041463A /* RowDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126094219E42950041463A /* RowDecoder.swift */; };
+		D1126096219E42950041463A /* RowDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126094219E42950041463A /* RowDecoder.swift */; };
+		D1126097219E42950041463A /* RowDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126094219E42950041463A /* RowDecoder.swift */; };
+		D1126098219E42950041463A /* RowDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126094219E42950041463A /* RowDecoder.swift */; };
+		D1126099219E42950041463A /* RowDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126094219E42950041463A /* RowDecoder.swift */; };
+		D112609A219E42950041463A /* RowDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1126094219E42950041463A /* RowDecoder.swift */; };
 		D13D04C4218DDEA10073F184 /* Restructure.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D13D04BA218DDEA10073F184 /* Restructure.framework */; };
 		D13D04CB218DDEA10073F184 /* Restructure_macOS.h in Headers */ = {isa = PBXBuildFile; fileRef = D13D04BD218DDEA10073F184 /* Restructure_macOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D13D04D6218DDF640073F184 /* Restructure.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13D04D5218DDF640073F184 /* Restructure.swift */; };
@@ -127,9 +136,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D111A4CC21B22C6000F84FE2 /* RowDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowDecoderTests.swift; sourceTree = "<group>"; };
 		D1126082219709EA0041463A /* StatementEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatementEncoder.swift; sourceTree = "<group>"; };
 		D112608921978CB60041463A /* StatementEncoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatementEncoderTests.swift; sourceTree = "<group>"; };
 		D112608D2197CAD60041463A /* ArrayStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayStrategy.swift; sourceTree = "<group>"; };
+		D1126094219E42950041463A /* RowDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowDecoder.swift; sourceTree = "<group>"; };
 		D13D04BA218DDEA10073F184 /* Restructure.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Restructure.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D13D04BD218DDEA10073F184 /* Restructure_macOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Restructure_macOS.h; sourceTree = "<group>"; };
 		D13D04BE218DDEA10073F184 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -235,17 +246,18 @@
 		D13D04B3218DDE3A0073F184 /* Restructure */ = {
 			isa = PBXGroup;
 			children = (
+				D112608D2197CAD60041463A /* ArrayStrategy.swift */,
 				D13D0562218FE17F0073F184 /* Date+Julian.swift */,
 				D13D0569218FE74D0073F184 /* DateStrategy.swift */,
 				D13D04D5218DDF640073F184 /* Restructure.swift */,
 				D13D04D8218DE0FC0073F184 /* RestructureError.swift */,
 				D13D054B218F50CE0073F184 /* Row.swift */,
+				D1126094219E42950041463A /* RowDecoder.swift */,
 				D13D0536218E430D0073F184 /* Statement.swift */,
+				D1126082219709EA0041463A /* StatementEncoder.swift */,
 				D13D0544218F2BBB0073F184 /* StepResult.swift */,
 				D13D04DB218DE2B10073F184 /* String+SQLite3.swift */,
 				D13D053D218E4BC70073F184 /* Structurable.swift */,
-				D1126082219709EA0041463A /* StatementEncoder.swift */,
-				D112608D2197CAD60041463A /* ArrayStrategy.swift */,
 			);
 			path = Restructure;
 			sourceTree = "<group>";
@@ -255,6 +267,7 @@
 			children = (
 				D13D055A218FC45E0073F184 /* RestructureInitializationTests.swift */,
 				D13D04DE218DF34B0073F184 /* RestructureTests.swift */,
+				D111A4CC21B22C6000F84FE2 /* RowDecoderTests.swift */,
 				D13D055E218FD7800073F184 /* RowTests.swift */,
 				D112608921978CB60041463A /* StatementEncoderTests.swift */,
 				D13D057021929A010073F184 /* StatementSequenceTests.swift */,
@@ -578,6 +591,7 @@
 				D13D04D9218DE0FC0073F184 /* RestructureError.swift in Sources */,
 				D13D054C218F50CE0073F184 /* Row.swift in Sources */,
 				D13D056A218FE74D0073F184 /* DateStrategy.swift in Sources */,
+				D1126095219E42950041463A /* RowDecoder.swift in Sources */,
 				D1126083219709EA0041463A /* StatementEncoder.swift in Sources */,
 				D13D04DC218DE2B10073F184 /* String+SQLite3.swift in Sources */,
 			);
@@ -588,6 +602,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D13D055F218FD7800073F184 /* RowTests.swift in Sources */,
+				D1126096219E42950041463A /* RowDecoder.swift in Sources */,
 				D13D0538218E430D0073F184 /* Statement.swift in Sources */,
 				D13D057121929A010073F184 /* StatementSequenceTests.swift in Sources */,
 				D13D0557218FBAA60073F184 /* TestHelpers.swift in Sources */,
@@ -603,6 +618,7 @@
 				D13D056B218FE74D0073F184 /* DateStrategy.swift in Sources */,
 				D13D0553218FB8C70073F184 /* StatementTests.swift in Sources */,
 				D13D04DF218DF34B0073F184 /* RestructureTests.swift in Sources */,
+				D111A4CD21B22C6000F84FE2 /* RowDecoderTests.swift in Sources */,
 				D13D0546218F2BBB0073F184 /* StepResult.swift in Sources */,
 				D13D04DA218DE0FC0073F184 /* RestructureError.swift in Sources */,
 			);
@@ -621,6 +637,7 @@
 				D13D0529218DF69D0073F184 /* RestructureError.swift in Sources */,
 				D13D054E218F50CE0073F184 /* Row.swift in Sources */,
 				D13D056C218FE74D0073F184 /* DateStrategy.swift in Sources */,
+				D1126097219E42950041463A /* RowDecoder.swift in Sources */,
 				D1126085219709EA0041463A /* StatementEncoder.swift in Sources */,
 				D13D052D218DF6A10073F184 /* String+SQLite3.swift in Sources */,
 			);
@@ -631,6 +648,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D13D0560218FD7800073F184 /* RowTests.swift in Sources */,
+				D1126098219E42950041463A /* RowDecoder.swift in Sources */,
 				D13D053A218E430D0073F184 /* Statement.swift in Sources */,
 				D13D057221929A010073F184 /* StatementSequenceTests.swift in Sources */,
 				D13D0558218FBAA60073F184 /* TestHelpers.swift in Sources */,
@@ -646,6 +664,7 @@
 				D13D056D218FE74D0073F184 /* DateStrategy.swift in Sources */,
 				D13D0554218FB8C70073F184 /* StatementTests.swift in Sources */,
 				D13D052A218DF69E0073F184 /* RestructureError.swift in Sources */,
+				D111A4CE21B22C6000F84FE2 /* RowDecoderTests.swift in Sources */,
 				D13D0548218F2BBB0073F184 /* StepResult.swift in Sources */,
 				D13D052E218DF6A20073F184 /* String+SQLite3.swift in Sources */,
 			);
@@ -664,6 +683,7 @@
 				D13D052B218DF69E0073F184 /* RestructureError.swift in Sources */,
 				D13D0550218F50CE0073F184 /* Row.swift in Sources */,
 				D13D056E218FE74D0073F184 /* DateStrategy.swift in Sources */,
+				D1126099219E42950041463A /* RowDecoder.swift in Sources */,
 				D1126087219709EA0041463A /* StatementEncoder.swift in Sources */,
 				D13D052F218DF6A20073F184 /* String+SQLite3.swift in Sources */,
 			);
@@ -674,6 +694,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D13D0561218FD7800073F184 /* RowTests.swift in Sources */,
+				D112609A219E42950041463A /* RowDecoder.swift in Sources */,
 				D13D053C218E430D0073F184 /* Statement.swift in Sources */,
 				D13D057321929A010073F184 /* StatementSequenceTests.swift in Sources */,
 				D13D0559218FBAA60073F184 /* TestHelpers.swift in Sources */,
@@ -689,6 +710,7 @@
 				D13D056F218FE74D0073F184 /* DateStrategy.swift in Sources */,
 				D13D0555218FB8C70073F184 /* StatementTests.swift in Sources */,
 				D13D052C218DF69E0073F184 /* RestructureError.swift in Sources */,
+				D111A4CF21B22C6000F84FE2 /* RowDecoderTests.swift in Sources */,
 				D13D054A218F2BBB0073F184 /* StepResult.swift in Sources */,
 				D13D0530218DF6A20073F184 /* String+SQLite3.swift in Sources */,
 			);

@@ -150,22 +150,18 @@ fileprivate struct _StatementEncodingContainer<K : CodingKey> : KeyedEncodingCon
     }
     
     mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: K) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        // TODO: Implement
         fatalError("Not Implemented")
     }
     
     mutating func nestedUnkeyedContainer(forKey key: K) -> UnkeyedEncodingContainer {
-        // TODO: Implement
         fatalError("Not Implemented")
     }
     
     mutating func superEncoder() -> Encoder {
-        // TODO: Implement
         fatalError("Not Implemented")
     }
     
     mutating func superEncoder(forKey key: K) -> Encoder {
-        // TODO: Implement
         fatalError("Not Implemented")
     }
 }

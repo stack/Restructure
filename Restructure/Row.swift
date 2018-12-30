@@ -16,6 +16,14 @@ public class Row {
     
     private let statement: Statement
     
+    internal var arrayStrategy: ArrayStrategy {
+        return statement.arrayStrategy
+    }
+    
+    internal var dateStrategy: DateStrategy {
+        return statement.dateStrategy
+    }
+    
     /// The names of the columns present in the row
     public var columns: [String] {
         return Array(statement.columns.keys)
@@ -23,6 +31,22 @@ public class Row {
     
     required internal init(statement: Statement) {
         self.statement = statement
+    }
+    
+    // MARK: - Nullability
+    
+    /// Returns `true` if the given column is NULL, otherwise `false`.
+    public func columnIsNull(key: String) -> Bool {
+        guard let index = statement.columns[key] else {
+            fatalError("Attempted to access the nullability of an unknown key")
+        }
+        
+        return columnIsNull(index: Int(index))
+    }
+    
+    /// Returns `true` if the given column is NULL, otherwise `false`.
+    public func columnIsNull(index: Int) -> Bool {
+        return sqlite3_column_type(statement.statement, Int32(index)) == SQLITE_NULL
     }
     
     // MARK: - Data Subscripts
