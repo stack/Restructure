@@ -188,4 +188,77 @@ public class Restructure {
         
         return statement
     }
+    
+    // MARK: - Transactions
+    
+    /// Start a transaction for the database
+    public func beginTransaction() {
+        sqlite3_exec(db, "BEGIN TRANSACTION", nil, nil, nil)
+    }
+    
+    /// Commit a transaction for the database
+    public func commitTransaction() {
+        sqlite3_exec(db, "COMMIT TRANSACTION", nil, nil, nil)
+    }
+    
+    /// Rollback a transaction for the database
+    public func rollbackTransaction() {
+        sqlite3_exec(db, "ROLLBACK TRANSACTION", nil, nil, nil)
+    }
+    
+    /**
+        Perform the given block in a transaction, rolling back on an error.
+     
+        - Parameter transactionBlock: A block of statements to perform in a transaction.
+     
+        - Throws: An `Error` if the block throws, which results in rolling back any statements in the transaction.
+     */
+    public func transaction(_ transactionBlock: (Restructure) throws -> ()) throws {
+        var potentialError: Error? = nil
+        
+        beginTransaction()
+        
+        do {
+            try transactionBlock(self)
+            commitTransaction()
+        } catch {
+            potentialError = error
+            rollbackTransaction()
+        }
+        
+        if let error = potentialError {
+            throw error
+        }
+    }
+    
+    // MARK: - Migration
+    
+    /**
+        Perform a schema migration, if applicable.
+     
+        - Parameter version: The version of the given migration, to determine whether the migration should be run.
+     
+        - Parameter migration: A block of statements to perform the migration.
+     
+        - Throws: An `Error` if the migration failed, or was performed out of order.
+     
+        - Note: Migrations affect the `userVersion` of the database. Migrations that have already run are ignored.
+     */
+    public func migrate(version: Int, migration: (Restructure) throws -> ()) throws {
+        // Skip if this migration has already run
+        guard userVersion < version else {
+            return
+        }
+        
+        // Ensure this is the next migration
+        guard version - userVersion == 1 else {
+            throw RestructureError.error("Attemped migration \(version) is out of order with \(userVersion)")
+        }
+        
+        // Run the migrations in a transaction
+        try transaction { try migration($0) }
+        
+        // Increment the user version on success
+        userVersion += 1
+    }
 }
