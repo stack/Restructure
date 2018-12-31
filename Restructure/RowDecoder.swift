@@ -10,7 +10,23 @@ import Foundation
 
 public class RowDecoder {
     
-    func decode<T : Decodable>(_ type: T.Type, from row: Row) throws -> T {
+    // MARK: - Initialization
+    
+    /// Initializes `self` with the default strategies.
+    public init() { }
+    
+    // MARK: - Decoding
+    
+    /**
+        Decodes a Row in to a given decodable type.
+     
+        - Parameter type: The type to attempt to decode to.
+     
+        - Parameter from: The Row to decode from.
+     
+        - Throws: `Error` if the decoding is not possible.
+     */
+    public func decode<T : Decodable>(_ type: T.Type, from row: Row) throws -> T {
         let decoder = _RowDecoder(referencing: row)
         
         return try type.init(from: decoder)
