@@ -180,6 +180,19 @@ public class Statement {
     // MARK: - Execution
     
     /**
+     Evaluate a non-select statement, throwing if an error occurred.
+     
+     - Throws: `RestructureError` if the statement failed to execute.
+     */
+    public func perform() throws {
+        let result = sqlite3_step(statement)
+        
+        guard result == SQLITE_DONE else {
+            throw RestructureError.from(result: result)
+        }
+    }
+    
+    /**
         Evaluate the statement, returning the result of the evaluation.
  
         - Returns: The result of the evaluation. Different statements returns different sets of results.
@@ -205,7 +218,6 @@ public class Statement {
             fatalError("Failed to handle step result \(result)")
         }
     }
-    
 }
 
 extension Statement: Sequence {

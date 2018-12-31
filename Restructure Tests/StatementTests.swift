@@ -73,7 +73,7 @@ class StatementTests: XCTestCase {
         let data = Data(bytes: UnsafePointer<UInt8>([ 0x41, 0x42, 0x43 ] as [UInt8]), count: 3)
         insertStatement.bind(value: data, for: "E")
         
-        _ = insertStatement.step()
+        XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
         let initialCount = fooCount
@@ -83,7 +83,7 @@ class StatementTests: XCTestCase {
         var deleteStatement: Statement!
         XCTAssertNoThrow(deleteStatement = try restructure.prepare(query: "DELETE FROM foo"))
         
-        _ = deleteStatement.step()
+        XCTAssertNoThrow(try deleteStatement.perform())
         
         // Ensure we have 0 rows
         let deletedCount = fooCount
@@ -106,7 +106,7 @@ class StatementTests: XCTestCase {
         let data = Data(bytes: UnsafePointer<UInt8>([ 0x41, 0x42, 0x43 ] as [UInt8]), count: 3)
         insertStatement.bind(value: data, for: "E")
         
-        _ = insertStatement.step()
+        XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
         let updatedCount = fooCount
@@ -169,7 +169,7 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: nullInt, for: "D")
         insertStatement.bind(value: nullData, for: "E")
         
-        _ = insertStatement.step()
+        XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
         let updatedCount = fooCount
@@ -213,7 +213,7 @@ class StatementTests: XCTestCase {
         let data = Data(bytes: UnsafePointer<UInt8>([ 0x41, 0x42, 0x43 ] as [UInt8]), count: 3)
         insertStatement.bind(value: data, for: "E")
         
-        _ = insertStatement.step()
+        XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
         let initialCount = fooCount
@@ -234,7 +234,7 @@ class StatementTests: XCTestCase {
         let data2 = Data(bytes: UnsafePointer<UInt8>([ 0x44, 0x45, 0x46 ] as [UInt8]), count: 3)
         updateStatement.bind(value: data2, for: "E")
         
-        _ = updateStatement.step()
+        XCTAssertNoThrow(try updateStatement.perform())
         
         // Ensure there is still one row
         let updatedCount = fooCount
@@ -290,7 +290,7 @@ class StatementTests: XCTestCase {
         let data1 = Data(bytes: UnsafePointer<UInt8>([ 0x01 ] as [UInt8]), count: 1)
         insertStatement.bind(value: data1, for: "E")
         
-        _ = insertStatement.step()
+        XCTAssertNoThrow(try insertStatement.perform())
         
         // Insert 2
         insertStatement.reset()
@@ -302,7 +302,7 @@ class StatementTests: XCTestCase {
         let data2 = Data(bytes: UnsafePointer<UInt8>([ 0x02 ] as [UInt8]), count: 1)
         insertStatement.bind(value: data2, for: "E")
         
-        _ = insertStatement.step()
+        XCTAssertNoThrow(try insertStatement.perform())
         insertStatement.reset()
         
         // Insert 3
@@ -315,7 +315,7 @@ class StatementTests: XCTestCase {
         let data3 = Data(bytes: UnsafePointer<UInt8>([ 0x03 ] as [UInt8]), count: 1)
         insertStatement.bind(value: data3, for: "E")
         
-        _ = insertStatement.step()
+        XCTAssertNoThrow(try insertStatement.perform())
         
         // Read rows
         let selectStatement = try! restructure.prepare(query: "SELECT a, b, c, d, e FROM foo ORDER BY c ASC")
