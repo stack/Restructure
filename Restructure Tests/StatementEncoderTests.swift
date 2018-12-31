@@ -127,4 +127,44 @@ class StatementEncoderTests: XCTestCase {
         
         XCTAssertEqual(row["e"], [[1, 2, 3]])
     }
+    
+    func testEncodingEnumRawValues() {
+        enum FooType: Int, Encodable {
+            case one = 0
+            case two = 1
+        }
+        
+        struct Foo: Encodable {
+            let id: Int64?
+            let type: FooType
+        }
+        
+        try! restructure.execute(query: "CREATE TABLE foobar (id INTEGER PRIMARY KEY AUTOINCREMENT, type INTEGER)")
+        
+        let statement = try! restructure.prepare(query: "INSERT INTO foobar (type) VALUES (:type)")
+        
+        let foo = Foo(id: nil, type: .two)
+        
+        let encoder = StatementEncoder()
+        
+        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        
+        var result = statement.step()
+        
+        guard case .done = result else {
+            XCTFail("Failed to insert data")
+            return
+        }
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT id, type FROM foobar LIMIT 1")
+        
+        result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["type"], 1)
+    }
 }

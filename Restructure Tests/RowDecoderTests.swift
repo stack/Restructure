@@ -22,7 +22,7 @@ class RowDecoderTests: XCTestCase {
         restructure = nil
     }
 
-    func testSimpleDecodable() throws {
+    func testSimpleDecodable() {
         struct Foo: Decodable {
             let a: Int64?
             let b: String
@@ -37,16 +37,11 @@ class RowDecoderTests: XCTestCase {
         insertStatement.bind(value: 3, for: "d")
         insertStatement.bind(value: Data(bytes: [0x4, 0x5, 0x6], count: 3), for: "e")
 
-        var result = insertStatement.step()
-        
-        guard case .done = result else {
-            XCTFail("Failed to insert data")
-            return
-        }
+        try! insertStatement.perform()
         
         let selectStatement = try! restructure.prepare(query: "SELECT a, b, c, d, e FROM foo LIMIT 1")
         
-        result = selectStatement.step()
+        let result = selectStatement.step()
         
         guard case let .row(row) = result else {
             XCTFail("Failed to fetch row")
@@ -54,7 +49,7 @@ class RowDecoderTests: XCTestCase {
         }
         
         let decoder = RowDecoder()
-        let foo = try decoder.decode(Foo.self, from: row)
+        let foo = try! decoder.decode(Foo.self, from: row)
         
         XCTAssertEqual(foo.b, "1")
         XCTAssertEqual(foo.c, 2.0)
@@ -62,7 +57,7 @@ class RowDecoderTests: XCTestCase {
         XCTAssertEqual(foo.e, Data(bytes: [0x4, 0x5, 0x6], count: 3))
     }
     
-    func testArrayDecodable() throws {
+    func testArrayDecodable() {
         struct Foo: Decodable {
             let a: Int64?
             let e: [Int]
@@ -71,16 +66,11 @@ class RowDecoderTests: XCTestCase {
         let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
         insertStatement.bind(value: [1, 2, 3], for: "e")
         
-        var result = insertStatement.step()
-        
-        guard case .done = result else {
-            XCTFail("Failed to insert data")
-            return
-        }
+        try! insertStatement.perform()
         
         let selectStatement = try! restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
         
-        result = selectStatement.step()
+        let result = selectStatement.step()
         
         guard case let .row(row) = result else {
             XCTFail("Failed to fetch row")
@@ -88,12 +78,12 @@ class RowDecoderTests: XCTestCase {
         }
         
         let decoder = RowDecoder()
-        let foo = try decoder.decode(Foo.self, from: row)
+        let foo = try! decoder.decode(Foo.self, from: row)
         
         XCTAssertEqual(foo.e, [1, 2, 3])
     }
     
-    func testMultiDimensionArrayDecodable() throws {
+    func testMultiDimensionArrayDecodable() {
         struct Foo: Decodable {
             let a: Int64?
             let e: [[Int]]
@@ -102,16 +92,11 @@ class RowDecoderTests: XCTestCase {
         let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
         insertStatement.bind(value: [[1, 2, 3], [4, 5, 6], [7, 8, 9]], for: "e")
         
-        var result = insertStatement.step()
-        
-        guard case .done = result else {
-            XCTFail("Failed to insert data")
-            return
-        }
+        try! insertStatement.perform()
         
         let selectStatement = try! restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
         
-        result = selectStatement.step()
+        let result = selectStatement.step()
         
         guard case let .row(row) = result else {
             XCTFail("Failed to fetch row")
@@ -119,9 +104,42 @@ class RowDecoderTests: XCTestCase {
         }
         
         let decoder = RowDecoder()
-        let foo = try decoder.decode(Foo.self, from: row)
+        let foo = try! decoder.decode(Foo.self, from: row)
         
         XCTAssertEqual(foo.e, [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    }
+    
+    func testDecodingEnumRawValues() {
+        enum FooType: Int, Decodable {
+            case one = 0
+            case two = 1
+        }
+        
+        struct Foo: Decodable {
+            let id: Int64?
+            let type: FooType
+        }
+        
+        try! restructure.execute(query: "CREATE TABLE foobar (id INTEGER PRIMARY KEY AUTOINCREMENT, type INTEGER)")
+        
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foobar (type) VALUES (:type)")
+        insertStatement.bind(value: 1, for: "type")
+        
+        try! insertStatement.perform()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT id, type FROM foobar LIMIT 1")
+        
+        let result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        let decoder = RowDecoder()
+        let foo = try! decoder.decode(Foo.self, from: row)
+        
+        XCTAssertEqual(foo.type, .two)
     }
 
 }

@@ -65,9 +65,90 @@ fileprivate struct _StatementEncoder: Encoder {
     }
     
     func singleValueContainer() -> SingleValueEncodingContainer {
-        // TODO: Implement
-        fatalError("Not Implemented")
+        return self
     }
+}
+
+extension _StatementEncoder: SingleValueEncodingContainer {
+    mutating func encodeNil() throws {
+        let key = codingPath.last!
+        statement.bind(value: nil, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Bool) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: String) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Double) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Float) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Int) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Int8) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Int16) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Int32) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: Int64) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: UInt) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: UInt8) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: UInt16) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: UInt32) throws {
+        let key = codingPath.last!
+        statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encode(_ value: UInt64) throws {
+        throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath, debugDescription: "Encoding UInt64 is not supported"))
+    }
+    
+    mutating func encode<T>(_ value: T) throws where T : Encodable {
+        throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath, debugDescription: "Encoding \(value) is not supported"))
+    }
+    
+    
 }
 
 // MARK: - Encoding Containers
@@ -78,7 +159,7 @@ fileprivate struct _StatementEncodingContainer<K : CodingKey> : KeyedEncodingCon
     // MARK: - Properties
     
     fileprivate let codingPath: [CodingKey]
-    private let encoder: _StatementEncoder
+    private var encoder: _StatementEncoder
     private let statement: Statement
     
     // MARK: - Initialization
@@ -153,7 +234,10 @@ fileprivate struct _StatementEncodingContainer<K : CodingKey> : KeyedEncodingCon
         if let structurable = value as? Structurable {
             statement.bind(value: structurable, for: key.stringValue)
         } else {
-            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath, debugDescription: "Encoding \(value) is not supported"))
+            encoder.codingPath.append(key)
+            defer { encoder.codingPath.removeLast() }
+            try! value.encode(to: self.encoder)
+            // throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath, debugDescription: "Encoding \(value) is not supported"))
         }
     }
     
