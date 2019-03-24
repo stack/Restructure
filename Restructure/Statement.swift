@@ -21,6 +21,8 @@ public class Statement {
     internal var bindables: [String:Int32] = [:]
     internal var columns: [String:Int32] = [:]
     
+    internal var isFinalized: Bool = false
+    
     public var arrayStrategy: ArrayStrategy = .bplist
     public var dateStrategy: DateStrategy = .integer
     
@@ -122,7 +124,17 @@ public class Statement {
     }
     
     deinit {
-        sqlite3_finalize(statement)
+        finalize()
+    }
+    
+    internal func finalize() {
+        guard !isFinalized else {
+            return
+        }
+        
+        restructure.finalize(statement: self)
+        
+        isFinalized = true
     }
     
     public func reset() {
@@ -217,6 +229,16 @@ public class Statement {
         default:
             fatalError("Failed to handle step result \(result)")
         }
+    }
+}
+
+extension Statement: Hashable {
+    public static func == (lhs: Statement, rhs: Statement) -> Bool {
+        return lhs.statement == rhs.statement
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(statement)
     }
 }
 

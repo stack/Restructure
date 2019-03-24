@@ -37,6 +37,8 @@ public class Restructure {
     
     private let path: String?
     
+    private var preparedStatements: Set<Statement> = []
+    
     /// Get the last inserted ID in to the database
     public var lastInsertedId: Int64 {
         return sqlite3_last_insert_rowid(db)
@@ -124,7 +126,11 @@ public class Restructure {
             return
         }
 
-        // FIXME: Finalize all statements
+        preparedStatements.forEach {
+            $0.finalize()
+        }
+        
+        preparedStatements.removeAll()
         
         sqlite3_close_v2(db)
         
@@ -208,7 +214,20 @@ public class Restructure {
         statement.arrayStrategy = arrayStrategy
         statement.dateStrategy = dateStrategy
         
+        preparedStatements.insert(statement)
+        
         return statement
+    }
+    
+    internal func finalize(statement: Statement) {
+        preparedStatements.remove(statement)
+        
+        let result = sqlite3_finalize(statement.statement)
+        
+        if result != SQLITE_OK {
+            let error = RestructureError.from(result: result)
+            fatalError("Failed to finalize the statement: \(error)")
+        }
     }
     
     // MARK: - Transactions
