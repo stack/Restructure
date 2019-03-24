@@ -15,15 +15,7 @@ class RestructureInitializationTests: XCTestCase {
     var tempPath: String = ""
     
     override func setUp() {
-        let baseURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-        let tempURL = baseURL.appendingPathComponent("Restructure Tests.db")
-        tempPath = tempURL.path
-        
-        let manager = FileManager.default
-        
-        if manager.fileExists(atPath: tempPath) {
-            try! manager.removeItem(atPath: tempPath)
-        }
+        tempPath = testPath(description: "Initialization Tests")
     }
     
     override func tearDown() {
@@ -60,6 +52,24 @@ class RestructureInitializationTests: XCTestCase {
         XCTAssertNotNil(restructure)
         
         XCTAssertNotNil(restructure)
+    }
+    
+    func testClosingTemporaryDeletedFile() {
+        // Ensure the file doesn't exist
+        XCTAssertFalse(FileManager.default.fileExists(atPath: tempPath))
+        
+        // Build the structure
+        restructure = try! Restructure(path: tempPath)
+        restructure!.isTemporary = true
+        
+        // Ensure the file does exist
+        XCTAssertTrue(FileManager.default.fileExists(atPath: tempPath))
+        
+        // Close and clean up
+        restructure!.close()
+        
+        // Ensure the file doesn't exist
+        XCTAssertFalse(FileManager.default.fileExists(atPath: tempPath))
     }
 
 }

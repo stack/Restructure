@@ -28,8 +28,14 @@ public class Restructure {
     /// The default date strategy used for all statements generated from this instance
     public var dateStrategy: DateStrategy = .integer
     
+    /// If an instance is temporary, the following occur on `close`:
+    /// -   The file used for storing the database will be deleted.
+    public var isTemporary: Bool = false
+    
     internal let db: SQLiteDatabase
     private var isOpen: Bool
+    
+    private let path: String?
     
     /// Get the last inserted ID in to the database
     public var lastInsertedId: Int64 {
@@ -100,6 +106,12 @@ public class Restructure {
         
         self.db = actualDb
         isOpen = true
+
+        if path == ":memory:" {
+            self.path = nil
+        } else {
+            self.path = path
+        }
         
         // Register all of the custom functions
         registerFunctions()
@@ -107,10 +119,20 @@ public class Restructure {
     
     /// Close a Structure object. Once closed, a Structure object should not be used again. The behaviour is undefined.
     public func close() {
-        if (isOpen) {
-            sqlite3_close_v2(db)
-            isOpen = false
+        // Prevent multiple closes
+        guard isOpen else {
+            return
         }
+
+        // FIXME: Finalize all statements
+        
+        sqlite3_close_v2(db)
+        
+        if let filePath = path {
+            try? FileManager.default.removeItem(atPath: filePath)
+        }
+        
+        isOpen = false
     }
     
     deinit {
