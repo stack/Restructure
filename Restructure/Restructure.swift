@@ -37,7 +37,7 @@ public class Restructure {
     
     private let path: String?
     
-    private var preparedStatements: Set<Statement> = []
+    private var preparedStatements: Set<SQLiteStatement> = []
     
     /// Get the last inserted ID in to the database
     public var lastInsertedId: Int64 {
@@ -127,7 +127,7 @@ public class Restructure {
         }
 
         preparedStatements.forEach {
-            $0.finalize()
+            sqlite3_finalize($0)
         }
         
         preparedStatements.removeAll()
@@ -214,13 +214,13 @@ public class Restructure {
         statement.arrayStrategy = arrayStrategy
         statement.dateStrategy = dateStrategy
         
-        preparedStatements.insert(statement)
+        preparedStatements.insert(statement.statement)
         
         return statement
     }
     
     internal func finalize(statement: Statement) {
-        preparedStatements.remove(statement)
+        preparedStatements.remove(statement.statement)
         
         let result = sqlite3_finalize(statement.statement)
         
