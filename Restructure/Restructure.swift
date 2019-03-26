@@ -164,10 +164,7 @@ public class Restructure {
             }
             
             let stringValue = String(cString: value).uppercased()
-            
-            stringValue.withCString {
-                sqlite3_result_text(context, $0, Int32(stringValue.lengthOfBytes(using: .utf8)), SQLITE_STATIC)
-            }
+            sqlite3_result_text(context, stringValue, Int32(stringValue.utf8.count), SQLITE_STATIC)
         }, nil, nil)
     }
     

@@ -62,6 +62,72 @@ class StatementEncoderTests: XCTestCase {
         XCTAssertEqual(row["e"], Data(bytes: [0x4, 0x5, 0x6], count: 3))
     }
     
+    func testEmojiStringEncodable() {
+        struct Foo: Encodable {
+            let a: Int64?
+            let b: String
+        }
+        
+        let statement = try! restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
+        
+        let foo = Foo(a: nil, b: "👋🏻 HELLO 👋🏼")
+        
+        let encoder = StatementEncoder()
+        
+        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        
+        var result = statement.step()
+        
+        guard case .done = result else {
+            XCTFail("Failed to insert data")
+            return
+        }
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
+        
+        result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["b"], "👋🏻 HELLO 👋🏼")
+    }
+    
+    func testUnicodeStringEncodable() {
+        struct Foo: Encodable {
+            let a: Int64?
+            let b: String
+        }
+        
+        let statement = try! restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
+        
+        let foo = Foo(a: nil, b: "exámple óóßChloë")
+        
+        let encoder = StatementEncoder()
+        
+        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        
+        var result = statement.step()
+        
+        guard case .done = result else {
+            XCTFail("Failed to insert data")
+            return
+        }
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
+        
+        result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        XCTAssertEqual(row["b"], "exámple óóßChloë")
+    }
+    
     func testArrayEncodable() {
         struct Foo: Encodable {
             let a: Int64?
