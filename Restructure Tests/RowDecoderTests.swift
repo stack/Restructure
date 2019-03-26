@@ -57,6 +57,58 @@ class RowDecoderTests: XCTestCase {
         XCTAssertEqual(foo.e, Data(bytes: [0x4, 0x5, 0x6], count: 3))
     }
     
+    func testEmojiStringDecodable() {
+        struct Foo: Decodable {
+            let a: Int64?
+            let b: String
+        }
+        
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
+        insertStatement.bind(value: "👋🏻 HELLO 👋🏼", for: "b")
+        
+        try! insertStatement.perform()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
+        
+        let result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        let decoder = RowDecoder()
+        let foo = try! decoder.decode(Foo.self, from: row)
+        
+        XCTAssertEqual(foo.b, "👋🏻 HELLO 👋🏼")
+    }
+    
+    func testUnicodeStringDecodable() {
+        struct Foo: Decodable {
+            let a: Int64?
+            let b: String
+        }
+        
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
+        insertStatement.bind(value: "exámple óóßChloë", for: "b")
+        
+        try! insertStatement.perform()
+        
+        let selectStatement = try! restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
+        
+        let result = selectStatement.step()
+        
+        guard case let .row(row) = result else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+        
+        let decoder = RowDecoder()
+        let foo = try! decoder.decode(Foo.self, from: row)
+        
+        XCTAssertEqual(foo.b, "exámple óóßChloë")
+    }
+    
     func testArrayDecodable() {
         struct Foo: Decodable {
             let a: Int64?

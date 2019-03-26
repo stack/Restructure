@@ -159,8 +159,8 @@ extension Data: Structurable {
     }
     
     public func bind(to statement: Statement, at index: Int) {
-        self.withUnsafeBytes { data -> Void in
-            sqlite3_bind_blob(statement.statement, Int32(index), data, Int32(self.count), SQLITE_TRANSIENT)
+        withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> Void in
+            sqlite3_bind_blob(statement.statement, Int32(index), bytes.baseAddress, Int32(self.count), SQLITE_TRANSIENT)
         }
     }
 }
@@ -271,8 +271,8 @@ extension Array: Structurable where Element: Structurable {
             }
         }
         
-        data.withUnsafeBytes { x -> Void in
-            sqlite3_bind_blob(statement.statement, Int32(index), x, Int32(data.count), SQLITE_TRANSIENT)
+        data.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> Void in
+            sqlite3_bind_blob(statement.statement, Int32(index), bytes.baseAddress, Int32(data.count), SQLITE_TRANSIENT)
         }
     }
 }
