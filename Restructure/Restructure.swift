@@ -272,6 +272,17 @@ public class Restructure {
     // MARK: - Migration
     
     /**
+        Does the database need migrated to the target version?
+ 
+        - Parameter targetVersion: The target migration version to test for.
+ 
+        - Returns: `true` if the database would need migrated, otherwise `false`.
+    */
+    public func needsMigration(targetVersion: Int) -> Bool {
+        return userVersion < targetVersion
+    }
+    
+    /**
         Perform a schema migration, if applicable.
      
         - Parameter version: The version of the given migration, to determine whether the migration should be run.

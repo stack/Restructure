@@ -36,7 +36,6 @@ class RestructureTests: XCTestCase {
         XCTAssertEqual(restructure!.userVersion, 42)
     }
     
-    
     // MARK: - Execution Tests
     
     func testExecutingInvalidQuery() {
@@ -75,6 +74,19 @@ class RestructureTests: XCTestCase {
     
     
     // MARK: - Migration Tests
+    
+    func testMigrationNeedDetectable() {
+        XCTAssertFalse(restructure.needsMigration(targetVersion: 0))
+        XCTAssertTrue(restructure.needsMigration(targetVersion: 1))
+        
+        restructure.userVersion = 42
+        
+        XCTAssertFalse(restructure.needsMigration(targetVersion: 40))
+        XCTAssertFalse(restructure.needsMigration(targetVersion: 41))
+        XCTAssertFalse(restructure.needsMigration(targetVersion: 42))
+        XCTAssertTrue(restructure.needsMigration(targetVersion: 43))
+        XCTAssertTrue(restructure.needsMigration(targetVersion: 44))
+    }
     
     func testMigrationWorksInitially() {
         XCTAssertEqual(restructure.userVersion, 0)
