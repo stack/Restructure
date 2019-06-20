@@ -190,8 +190,27 @@ let decoder = RowDecoder()
 for row in statement }
     let foo = try! decoder.decode(Foo.self, from: row)
 }
-
 ```
+
+### Migrations
+
+The Restructure object has a `userVersion` property to track the version of a
+database. This can be used for any purpose, but is best used for migrations.
+
+```swift
+// Run an initial migration
+try restructure.migrate(version: 1) {
+    // Execute statements here
+}
+
+// Run another migration
+try restructure.migrate(version: 2) {
+    // Execute more statements here
+}
+```
+
+After each run of `migrate`, the `userVersion` value is incremented. Subsequent
+runs of migrations are ignored for versions that have already been run.
 
 ## Caveats
 
