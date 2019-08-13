@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+-   `AutoVacuum` dictates the automatic vacuuming mode.
 -   `JournalMode` dictates the journaling mode used by the database.
+-   `SecureDelete` dictates the data deletion mode.
+-   `incrementalVacuum` can be used with `AutoVacuum.incremental` to affect vacuuming.
+-   `vacuum` causes a full database vacuum to occur.
 
 ### Changed
 -   Restructure is now a SwiftPM project. All legacy build tools have been removed.

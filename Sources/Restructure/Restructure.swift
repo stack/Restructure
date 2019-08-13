@@ -32,6 +32,34 @@ public class Restructure {
     /// -   The file used for storing the database will be deleted.
     public var isTemporary: Bool = false
     
+    /// The auto vacuum mode used by the dtabase. The default is `.none`.
+    public var autoVacuum: AutoVacuum {
+        get {
+            do {
+                let statement = try prepare(query: "PRAGMA auto_vacuum")
+                let result = statement.step()
+                
+                switch result {
+                case let .row(row):
+                    return AutoVacuum.from(string: row[0])
+                default:
+                    fatalError("Failed to fetch auto_vacuum pragma from a result: \(result)")
+                }
+            } catch {
+                fatalError("Failed to fetch auto_vacuum pragma: \(error)")
+            }
+        }
+        
+        set {
+            let result = sqlite3_exec(db, "PRAGMA auto_vacuum = \(newValue.pragmaString)", nil, nil, nil)
+            
+            if result != SQLITE_OK {
+                let error = RestructureError.from(result: result)
+                fatalError("Failed to set auto_vacuum: \(error)")
+            }
+        }
+    }
+
     /// The journaling mode used by the database. The default is `.memory` for in-memory databases and `.wal` for file-backed databases.
     public var journalMode: JournalMode {
         get {
@@ -51,11 +79,39 @@ public class Restructure {
         }
         
         set {
-            let result = sqlite3_exec(db, "PRAGMA journal_mode = \(newValue.stringValue)", nil, nil, nil)
+            let result = sqlite3_exec(db, "PRAGMA journal_mode = \(newValue.pragmaString)", nil, nil, nil)
             
             if result != SQLITE_OK {
                 let error = RestructureError.from(result: result)
                 fatalError("Failed to set journal_mode: \(error)")
+            }
+        }
+    }
+    
+    /// The method used when deleting data.
+    public var secureDelete: SecureDelete {
+        get {
+            do {
+                let statement = try prepare(query: "PRAGMA secure_delete")
+                let result = statement.step()
+                
+                switch result {
+                case let .row(row):
+                    return SecureDelete.from(string: row[0])
+                default:
+                    fatalError("Failed to fetch secure_delete pragma from a result: \(result)")
+                }
+            } catch {
+                fatalError("Failed to fetch secure_delete pragma: \(error)")
+            }
+        }
+        
+        set {
+            let result = sqlite3_exec(db, "PRAGMA secure_delete = \(newValue.pragmaString)", nil, nil, nil)
+            
+            if result != SQLITE_OK {
+                let error = RestructureError.from(result: result)
+                fatalError("Failed to set secure_delete: \(error)")
             }
         }
     }
@@ -341,5 +397,35 @@ public class Restructure {
         
         // Increment the user version on success
         userVersion += 1
+    }
+    
+    // MARK: - Utilities
+    
+    /// Send an incremental vacuum request to clean the given amount of pages
+    public func incrementalVacuum(pages: Int = 0) {
+        let query: String
+        
+        if pages < 1 {
+            query = "PRAGMA incremental_vacuum"
+        } else {
+            query = "PRAGMA incremental_vacuum(\(pages))"
+        }
+        
+        let result = sqlite3_exec(db, query, nil, nil, nil)
+        
+        if result != SQLITE_OK {
+            let error = RestructureError.from(result: result)
+            fatalError("Failed to incremental vacuum: \(error)")
+        }
+    }
+    
+    /// Perform a vacuum operation on the database.
+    public func vacuum() {
+        let result = sqlite3_exec(db, "VACUUM", nil, nil, nil)
+        
+        if result != SQLITE_OK {
+            let error = RestructureError.from(result: result)
+            fatalError("Failed to vacuum: \(error)")
+        }
     }
 }

@@ -89,5 +89,42 @@ class RestructureInitializationTests: XCTestCase {
             restructure!.close()
         }
     }
-
+    
+    func testSecureDeleteSettable() {
+        for mode in SecureDelete.allCases {
+            restructure = try! Restructure(path: tempPath)
+            restructure!.secureDelete = mode
+            
+            let newMode = restructure!.secureDelete
+            XCTAssertEqual(newMode, mode)
+            
+            restructure!.close()
+        }
+    }
+    
+    func testAutoVacuumSettable() {
+        for mode in AutoVacuum.allCases {
+            restructure = try! Restructure(path: tempPath)
+            restructure!.autoVacuum = mode
+            restructure!.vacuum()
+            
+            let newMode = restructure!.autoVacuum
+            XCTAssertEqual(newMode, mode)
+            
+            restructure!.close()
+        }
+    }
+    
+    func testIncrementalAutoVacuum() {
+        restructure = try! Restructure(path: tempPath)
+        restructure!.autoVacuum = .incremental
+        restructure!.vacuum()
+        
+        restructure!.incrementalVacuum()
+        restructure!.incrementalVacuum(pages: 2)
+        
+        XCTSuccess()
+        
+        restructure!.close()
+    }
 }

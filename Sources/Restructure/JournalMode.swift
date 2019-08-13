@@ -9,7 +9,7 @@
 import Foundation
 
 /// The journaling mode used by the database.
-public enum JournalMode: CaseIterable {
+public enum JournalMode: CaseIterable, PragmaRepresentable {
     /// The rollback journal is deleted after a transaction.
     case delete
     /// The rollback journal is truncated after a transaction.
@@ -44,7 +44,7 @@ public enum JournalMode: CaseIterable {
     }
     
     /// Get a SQlite compatible string representation of the `JournalMode`.
-    var stringValue: String {
+    var pragmaString: String {
         switch self {
         case .delete:
             return "DELETE"
