@@ -71,5 +71,23 @@ class RestructureInitializationTests: XCTestCase {
         // Ensure the file doesn't exist
         XCTAssertFalse(FileManager.default.fileExists(atPath: tempPath))
     }
+    
+    func testJournalModeDefault() {
+        restructure = try! Restructure(path: tempPath)
+        XCTAssertEqual(restructure!.journalMode, .wal)
+        restructure!.close()
+        
+        restructure = try! Restructure()
+        XCTAssertEqual(restructure!.journalMode, .memory)
+        restructure!.close()
+    }
+    
+    func testJournalModeSettable() {
+        for mode in JournalMode.allCases {
+            restructure = try! Restructure(path: tempPath, journalMode: mode)
+            XCTAssertEqual(restructure!.journalMode, mode)
+            restructure!.close()
+        }
+    }
 
 }

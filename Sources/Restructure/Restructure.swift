@@ -32,6 +32,34 @@ public class Restructure {
     /// -   The file used for storing the database will be deleted.
     public var isTemporary: Bool = false
     
+    /// The journaling mode used by the database. The default is `.memory` for in-memory databases and `.wal` for file-backed databases.
+    public var journalMode: JournalMode {
+        get {
+            do {
+                let statement = try prepare(query: "PRAGMA journal_mode")
+                let result = statement.step()
+                
+                switch result {
+                case let .row(row):
+                    return JournalMode.from(string: row[0])
+                default:
+                    fatalError("Failed to fetch journal_mode pragma from a result: \(result)")
+                }
+            } catch {
+                fatalError("Failed to fetch journal_mode pragma: \(error)")
+            }
+        }
+        
+        set {
+            let result = sqlite3_exec(db, "PRAGMA journal_mode = \(newValue.stringValue)", nil, nil, nil)
+            
+            if result != SQLITE_OK {
+                let error = RestructureError.from(result: result)
+                fatalError("Failed to set journal_mode: \(error)")
+            }
+        }
+    }
+    
     internal let db: SQLiteDatabase
     private var isOpen: Bool
     
@@ -58,7 +86,7 @@ public class Restructure {
                     fatalError("Failed to fetch user_version pragma from a result: \(result)")
                 }
             } catch {
-                fatalError("Failed to fetching user_version pragma: \(error)")
+                fatalError("Failed to fetch user_version pragma: \(error)")
             }
         }
         
@@ -91,7 +119,7 @@ public class Restructure {
      
         - Throws: `StructureError.InternalError` if opening the database fails.
      */
-    required public init(path: String) throws {
+    required public init(path: String, journalMode: JournalMode = .wal) throws {
         // Build the database object
         var db: SQLiteDatabase? = nil
         let result = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nil)
@@ -113,7 +141,11 @@ public class Restructure {
             self.path = nil
         } else {
             self.path = path
+            
         }
+
+        // Set up the database settings
+        self.journalMode = journalMode
         
         // Register all of the custom functions
         registerFunctions()
