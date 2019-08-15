@@ -17,15 +17,12 @@ public class RowDecoder {
     
     // MARK: - Decoding
     
-    /**
-        Decodes a Row in to a given decodable type.
-     
-        - Parameter type: The type to attempt to decode to.
-     
-        - Parameter from: The Row to decode from.
-     
-        - Throws: `Error` if the decoding is not possible.
-     */
+    /// Decodes a Row in to a given decodable type.
+    ///
+    /// - Parameter type: The type to attempt to decode to.
+    /// - Parameter from: The Row to decode from.
+    ///
+    /// - Throws: `Error` if the decoding is not possible.
     public func decode<T : Decodable>(_ type: T.Type, from row: Row) throws -> T {
         let decoder = _RowDecoder(referencing: row)
         

@@ -51,13 +51,11 @@ public class Row {
     
     // MARK: - Data Subscripts
     
-    /**
-        Returns the non-null `Structurable` value for the given index value.
-     
-        - Parameter index: The index of the given value.
-     
-        - Returns: The `Structurable` value associated with the index, transformed by the underlying SQLite API if necessary.
-     */
+    /// Returns the non-null `Structurable` value for the given index value.
+    ///
+    /// - Parameter index: The index of the given value.
+    ///
+    /// - Returns: The `Structurable` value associated with the index, transformed by the underlying SQLite API if necessary.
     public subscript<T: Structurable>(index: Int) -> T {
         // Non-null return type, so ensure the value isn't actually null
         if sqlite3_column_type(statement.statement, Int32(index)) == SQLITE_NULL {
@@ -68,13 +66,11 @@ public class Row {
         return T.from(statement, at: index)
     }
     
-    /**
-        Returns the non-null `Structurable` value for the given key.
-     
-        - Parameter key: The key for the given value.
-     
-        - Returns: The `Structurable` value associated with the key, transformed by the underlying SQLite API if necessary.
-     */
+    /// Returns the non-null `Structurable` value for the given key.
+    ///
+    /// - Parameter key: The key for the given value.
+    ///
+    /// - Returns: The `Structurable` value associated with the key, transformed by the underlying SQLite API if necessary.
     public subscript<T: Structurable>(key: String) -> T {
         guard let index = statement.columns[key] else {
             fatalError("Attempted to access the subscript of an unknown key")
@@ -83,13 +79,11 @@ public class Row {
         return self[Int(index)]
     }
     
-    /**
-     Returns the nullable `Structurable` value for the given index value.
-     
-     - Parameter index: The index of the given value.
-     
-     - Returns: The `Structurable` value associated with the index, transformed by the underlying SQLite API if necessary, or `nil`.
-     */
+    ///Returns the nullable `Structurable` value for the given index value.
+    ///
+    /// - Parameter index: The index of the given value.
+    ///
+    /// - Returns: The `Structurable` value associated with the index, transformed by the underlying SQLite API if necessary, or `nil`.
     public subscript<T: Structurable>(index: Int) -> T? {
         // Non-null return type, so ensure the value isn't actually null
         if sqlite3_column_type(statement.statement, Int32(index)) == SQLITE_NULL {
@@ -100,13 +94,11 @@ public class Row {
         return T.from(statement, at: index)
     }
     
-    /**
-     Returns the nullable `Structurable` value for the given key.
-     
-     - Parameter key: The key for the given value.
-     
-     - Returns: The `Structurable` value associated with the key, transformed by the underlying SQLite API if necessary, or `nil`.
-     */
+    /// Returns the nullable `Structurable` value for the given key.
+    ///
+    /// - Parameter key: The key for the given value.
+    ///
+    /// - Returns: The `Structurable` value associated with the key, transformed by the underlying SQLite API if necessary, or `nil`.
     public subscript<T: Structurable>(key: String) -> T? {
         guard let index = statement.columns[key] else {
             fatalError("Attempted to access the subscript of an unknown key")

@@ -71,22 +71,18 @@ public class Restructure {
     
     // MARK: - Initialization
     
-    /**
-        Initializes a new Structure object with all data stored in memory. No data will be persisted.
-     
-        - Throws: `StructureError.InternalError` if opening the database fails.
-     */
+    /// Initializes a new Structure object with all data stored in memory. No data will be persisted.
+    ///
+    /// - Throws: `StructureError.InternalError` if opening the database fails.
     convenience public init() throws {
         try self.init(path: ":memory:")
     }
     
-    /**
-        Initializes a new Structure object at the given path. If the file already exists, it will be opened, otherwise it will be created.
-     
-        - Parameter path: The full path to the Structure object to open or create.
-     
-        - Throws: `StructureError.InternalError` if opening the database fails.
-     */
+    /// Initializes a new Structure object at the given path. If the file already exists, it will be opened, otherwise it will be created.
+    ///
+    /// - Parameter path: The full path to the Structure object to open or create.
+    ///
+    /// - Throws: `StructureError.InternalError` if opening the database fails.
     required public init(path: String, journalMode: JournalMode = .wal) throws {
         // Build the database object
         var db: SQLiteDatabase? = nil
@@ -170,14 +166,11 @@ public class Restructure {
     
     // MARK: - Querying
     
-    /**
-        Simply executes a statement with a success / failure result.
- 
-        - Parameter query: The SQL statement to execute
- 
-        - Throws: `StructureError.InternalError` if the execution failed.
-    */
-    
+    /// Simply executes a statement with a success / failure result.
+    ///
+    /// - Parameter query: The SQL statement to execute
+    ///
+    /// - Throws: `StructureError.InternalError` if the execution failed.
     public func execute(query: String) throws {
         var errorMessage: UnsafeMutablePointer<Int8>? = nil
         let result = sqlite3_exec(db, query, nil, nil, &errorMessage)
@@ -197,15 +190,13 @@ public class Restructure {
         }
     }
     
-    /**
-        Prepare a new `Statement` for the database
-     
-        - Parameter query: The SQL statement to prepare
-     
-        - Throws: `StructureError.InternalError` if the statement cannot be parsed.
-     
-        - Returns: An unexecuted, unbound statement.
-     */
+    /// Prepare a new `Statement` for the database
+    ///
+    /// - Parameter query: The SQL statement to prepare
+    ///
+    /// - Throws: `StructureError.InternalError` if the statement cannot be parsed.
+    ///
+    /// - Returns: An unexecuted, unbound statement.
     public func prepare(query: String) throws -> Statement {
         let statement = try Statement(restructure: self, query: query)
         statement.arrayStrategy = arrayStrategy
@@ -244,13 +235,11 @@ public class Restructure {
         sqlite3_exec(db, "ROLLBACK TRANSACTION", nil, nil, nil)
     }
     
-    /**
-        Perform the given block in a transaction, rolling back on an error.
-     
-        - Parameter transactionBlock: A block of statements to perform in a transaction.
-     
-        - Throws: An `Error` if the block throws, which results in rolling back any statements in the transaction.
-     */
+    /// Perform the given block in a transaction, rolling back on an error.
+    ///
+    /// - Parameter transactionBlock: A block of statements to perform in a transaction.
+    ///
+    /// - Throws: An `Error` if the block throws, which results in rolling back any statements in the transaction.
     public func transaction(_ transactionBlock: (Restructure) throws -> ()) throws {
         var potentialError: Error? = nil
         
@@ -271,28 +260,24 @@ public class Restructure {
     
     // MARK: - Migration
     
-    /**
-        Does the database need migrated to the target version?
- 
-        - Parameter targetVersion: The target migration version to test for.
- 
-        - Returns: `true` if the database would need migrated, otherwise `false`.
-    */
+    /// Does the database need migrated to the target version?
+    ///
+    /// - Parameter targetVersion: The target migration version to test for.
+    ///
+    /// - Returns: `true` if the database would need migrated, otherwise `false`.
     public func needsMigration(targetVersion: Int) -> Bool {
         return userVersion < targetVersion
     }
     
-    /**
-        Perform a schema migration, if applicable.
-     
-        - Parameter version: The version of the given migration, to determine whether the migration should be run.
-     
-        - Parameter migration: A block of statements to perform the migration.
-     
-        - Throws: An `Error` if the migration failed, or was performed out of order.
-     
-        - Note: Migrations affect the `userVersion` of the database. Migrations that have already run are ignored.
-     */
+    /// Perform a schema migration, if applicable.
+    ///
+    /// - Parameter version: The version of the given migration, to determine whether the migration should be run.
+    ///
+    /// - Parameter migration: A block of statements to perform the migration.
+    ///
+    /// - Throws: An `Error` if the migration failed, or was performed out of order.
+    ///
+    /// - Note: Migrations affect the `userVersion` of the database. Migrations that have already run are ignored.
     public func migrate(version: Int, migration: (Restructure) throws -> ()) throws {
         // Skip if this migration has already run
         guard userVersion < version else {

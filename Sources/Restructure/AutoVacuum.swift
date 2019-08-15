@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// The automatic vacuuming setting to use for the database
 public enum AutoVacuum: CaseIterable, PragmaRepresentable {
     /// No auto vacuuming is done.
     case none
@@ -16,6 +17,7 @@ public enum AutoVacuum: CaseIterable, PragmaRepresentable {
     /// Auto vacuuming occurs with the `Restructure.incrementalVacuum` call.
     case incremental
     
+    /// Create an `AutoVacuum` value from a database string.
     static func from(value: String) -> AutoVacuum {
         switch value.uppercased() {
         case "0", "NONE":
@@ -29,6 +31,7 @@ public enum AutoVacuum: CaseIterable, PragmaRepresentable {
         }
     }
     
+    /// Create a database string representation of an `AutoVacuum` value.
     var pragmaValue: String {
         switch self {
         case .none:
