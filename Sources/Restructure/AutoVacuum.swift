@@ -8,12 +8,15 @@
 
 import Foundation
 
-public enum AutoVacuum: CaseIterable, PragmaRepresentable{
+public enum AutoVacuum: CaseIterable, PragmaRepresentable {
+    /// No auto vacuuming is done.
     case none
+    /// Auto vacuuming occurs after every transaction.
     case full
+    /// Auto vacuuming occurs with the `Restructure.incrementalVacuum` call.
     case incremental
     
-    static func from(string value: String) -> AutoVacuum {
+    static func from(value: String) -> AutoVacuum {
         switch value.uppercased() {
         case "0", "NONE":
             return .none
@@ -26,7 +29,7 @@ public enum AutoVacuum: CaseIterable, PragmaRepresentable{
         }
     }
     
-    var pragmaString: String {
+    var pragmaValue: String {
         switch self {
         case .none:
             return "NONE"

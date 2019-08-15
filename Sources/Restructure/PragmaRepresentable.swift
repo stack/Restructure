@@ -9,8 +9,20 @@
 import Foundation
 
 protocol PragmaRepresentable {
+    associatedtype PragmaType: Structurable
 
-    static func from(string value: String) -> Self
-    var pragmaString: String { get }
+    static func from(value: PragmaType) -> Self
+    var pragmaValue: PragmaType { get }
     
+}
+
+extension Int: PragmaRepresentable {
+    
+    static func from(value: Int) -> Int {
+        return value
+    }
+    
+    var pragmaValue: Int {
+        return self
+    }
 }

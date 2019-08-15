@@ -24,7 +24,7 @@ public enum JournalMode: CaseIterable, PragmaRepresentable {
     case off
     
     /// Create a `JournalMode` from a SQlite representation
-    static func from(string value: String) -> JournalMode {
+    static func from(value: String) -> JournalMode {
         switch value.uppercased() {
         case "DELETE":
             return .delete
@@ -44,7 +44,7 @@ public enum JournalMode: CaseIterable, PragmaRepresentable {
     }
     
     /// Get a SQlite compatible string representation of the `JournalMode`.
-    var pragmaString: String {
+    var pragmaValue: String {
         switch self {
         case .delete:
             return "DELETE"

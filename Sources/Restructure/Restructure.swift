@@ -34,86 +34,20 @@ public class Restructure {
     
     /// The auto vacuum mode used by the dtabase. The default is `.none`.
     public var autoVacuum: AutoVacuum {
-        get {
-            do {
-                let statement = try prepare(query: "PRAGMA auto_vacuum")
-                let result = statement.step()
-                
-                switch result {
-                case let .row(row):
-                    return AutoVacuum.from(string: row[0])
-                default:
-                    fatalError("Failed to fetch auto_vacuum pragma from a result: \(result)")
-                }
-            } catch {
-                fatalError("Failed to fetch auto_vacuum pragma: \(error)")
-            }
-        }
-        
-        set {
-            let result = sqlite3_exec(db, "PRAGMA auto_vacuum = \(newValue.pragmaString)", nil, nil, nil)
-            
-            if result != SQLITE_OK {
-                let error = RestructureError.from(result: result)
-                fatalError("Failed to set auto_vacuum: \(error)")
-            }
-        }
+        get { get(pragma: "auto_vacuum") }
+        set { set(pragma: "auto_vacuum", value: newValue) }
     }
 
     /// The journaling mode used by the database. The default is `.memory` for in-memory databases and `.wal` for file-backed databases.
     public var journalMode: JournalMode {
-        get {
-            do {
-                let statement = try prepare(query: "PRAGMA journal_mode")
-                let result = statement.step()
-                
-                switch result {
-                case let .row(row):
-                    return JournalMode.from(string: row[0])
-                default:
-                    fatalError("Failed to fetch journal_mode pragma from a result: \(result)")
-                }
-            } catch {
-                fatalError("Failed to fetch journal_mode pragma: \(error)")
-            }
-        }
-        
-        set {
-            let result = sqlite3_exec(db, "PRAGMA journal_mode = \(newValue.pragmaString)", nil, nil, nil)
-            
-            if result != SQLITE_OK {
-                let error = RestructureError.from(result: result)
-                fatalError("Failed to set journal_mode: \(error)")
-            }
-        }
+        get { get(pragma: "journal_mode") }
+        set { set(pragma: "journal_mode", value: newValue) }
     }
     
     /// The method used when deleting data.
     public var secureDelete: SecureDelete {
-        get {
-            do {
-                let statement = try prepare(query: "PRAGMA secure_delete")
-                let result = statement.step()
-                
-                switch result {
-                case let .row(row):
-                    return SecureDelete.from(string: row[0])
-                default:
-                    fatalError("Failed to fetch secure_delete pragma from a result: \(result)")
-                }
-            } catch {
-                fatalError("Failed to fetch secure_delete pragma: \(error)")
-            }
-        }
-        
-        set {
-            let result = sqlite3_exec(db, "PRAGMA secure_delete = \(newValue.pragmaString)", nil, nil, nil)
-            
-            if result != SQLITE_OK {
-                let error = RestructureError.from(result: result)
-                fatalError("Failed to set secure_delete: \(error)")
-            }
-        }
+        get { get(pragma: "secure_delete") }
+        set { set(pragma: "secure_delete", value: newValue) }
     }
     
     internal let db: SQLiteDatabase
@@ -130,30 +64,8 @@ public class Restructure {
     
     /// A number stored along with the database, typically used for schema versioning
     public internal(set) var userVersion: Int {
-        get {
-            do {
-                let statement = try prepare(query: "PRAGMA user_version")
-                let result = statement.step()
-                
-                switch result {
-                case let .row(row):
-                    return row[0]
-                default:
-                    fatalError("Failed to fetch user_version pragma from a result: \(result)")
-                }
-            } catch {
-                fatalError("Failed to fetch user_version pragma: \(error)")
-            }
-        }
-        
-        set {
-            let result = sqlite3_exec(db, "PRAGMA user_version = \(newValue)", nil, nil, nil)
-            
-            if result != SQLITE_OK {
-                let error = RestructureError.from(result: result)
-                fatalError("Failed to set the user_version: \(error)")
-            }
-        }
+        get { get(pragma: "user_version") }
+        set { set(pragma: "user_version", value: newValue) }
     }
     
     
@@ -400,6 +312,33 @@ public class Restructure {
     }
     
     // MARK: - Utilities
+    
+    /// Get a value for a given pragma
+    private func get<T: PragmaRepresentable>(pragma: String) -> T {
+        do {
+            let statement = try prepare(query: "PRAGMA \(pragma)")
+            let result = statement.step()
+            
+            switch result {
+            case let .row(row):
+                return T.from(value: row[0])
+            default:
+                fatalError("Failed to fetch \(pragma) pragma from a result: \(result)")
+            }
+        } catch {
+            fatalError("Failed to fetch \(pragma) pragma: \(error)")
+        }
+    }
+    
+    /// Set the value of a pragma
+    private func set<T: PragmaRepresentable>(pragma: String, value: T) {
+        let result = sqlite3_exec(db, "PRAGMA \(pragma) = \(value.pragmaValue)", nil, nil, nil)
+        
+        if result != SQLITE_OK {
+            let error = RestructureError.from(result: result)
+            fatalError("Failed to set \(pragma): \(error)")
+        }
+    }
     
     /// Send an incremental vacuum request to clean the given amount of pages
     public func incrementalVacuum(pages: Int = 0) {

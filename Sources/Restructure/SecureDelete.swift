@@ -17,7 +17,7 @@ public enum SecureDelete: CaseIterable, PragmaRepresentable {
     /// Deleted data is zeroed only when it exists on the filesystem
     case fast
     
-    static func from(string value: String) -> SecureDelete {
+    static func from(value: String) -> SecureDelete {
         switch value.uppercased() {
         case "1":
             return .on
@@ -30,7 +30,7 @@ public enum SecureDelete: CaseIterable, PragmaRepresentable {
         }
     }
     
-    var pragmaString: String {
+    var pragmaValue: String {
         switch self {
         case .on:
             return "1"
