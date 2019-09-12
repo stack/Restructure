@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 -   Restructure is now a SwiftPM project. All legacy build tools have been removed.
--   The `Restructure` constructor takes a defaulted paramter for a journal mode.
+-   The `Restructure` constructor takes a defaulted parameter for a journal mode.
 
 ## 1.0.0 - 2019-06-20
 ### Added
