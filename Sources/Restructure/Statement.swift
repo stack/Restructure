@@ -148,14 +148,12 @@ public class Statement {
     
     // MARK: - Binding
     
-    /**
-        Bind a `Bindable` value to the given index.
- 
-        - Parameter value: The `Bindable` value to assign to the index.
-        - Parameter at: The index to bind to.
-        - Remark:
-            Bindable indexes start at 1, not 0.
-    */
+    /// Bind a `Bindable` value to the given index.
+    ///
+    /// - Parameter value: The `Bindable` value to assign to the index.
+    /// - Parameter at: The index to bind to.
+    /// - Remark:
+    ///     Bindable indexes start at 1, not 0.
     public func bind(value: Structurable?, at index: Int32) {
         precondition(index > 0)
         
@@ -169,15 +167,13 @@ public class Statement {
         bindable.bind(to: self, at: Int(index))
     }
     
-    /**
-     Bind a `Bindable` value to the given index.
-     
-     - Parameter value: The `Bindable` value to assign to the index.
-     - Parameter for: The name of the bindable.
-     - Remark:
-        Bindable indexes start at 1, not 0.
-        Bindable names start with ':', '@', or '$' when the statement is prepared. They are referenced here without the prefix.
-     */
+    /// Bind a `Bindable` value to the given index.
+    ///
+    /// - Parameter value: The `Bindable` value to assign to the index.
+    /// - Parameter for: The name of the bindable.
+    /// - Remark:
+    ///     Bindable indexes start at 1, not 0.
+    ///     Bindable names start with ':', '@', or '$' when the statement is prepared. They are referenced here without the prefix.
     public func bind(value: Structurable?, for key: String) {
         // Ensure we can map a parameter to an index
         guard let index = bindables[key] else {
@@ -191,11 +187,9 @@ public class Statement {
     
     // MARK: - Execution
     
-    /**
-     Evaluate a non-select statement, throwing if an error occurred.
-     
-     - Throws: `RestructureError` if the statement failed to execute.
-     */
+    /// Evaluate a non-select statement, throwing if an error occurred.
+    ///
+    /// - Throws: `RestructureError` if the statement failed to execute.
     public func perform() throws {
         let result = sqlite3_step(statement)
         
@@ -204,14 +198,12 @@ public class Statement {
         }
     }
     
-    /**
-        Evaluate the statement, returning the result of the evaluation.
- 
-        - Returns: The result of the evaluation. Different statements returns different sets of results.
-        - Remark:
-            For statements that return rows, you will get a series of `row`s followed by `done`.
-            For all other statements, you will get `done` on success.
-     */
+    /// Evaluate the statement, returning the result of the evaluation.
+    ///
+    /// - Returns: The result of the evaluation. Different statements returns different sets of results.
+    /// - Remark:
+    ///     For statements that return rows, you will get a series of `row`s followed by `done`.
+    ///     For all other statements, you will get `done` on success.
     public func step() -> StepResult {
         let result = sqlite3_step(statement)
         

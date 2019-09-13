@@ -32,6 +32,24 @@ public class Restructure {
     /// -   The file used for storing the database will be deleted.
     public var isTemporary: Bool = false
     
+    /// The auto vacuum mode used by the dtabase. The default is `.none`.
+    public var autoVacuum: AutoVacuum {
+        get { get(pragma: "auto_vacuum") }
+        set { set(pragma: "auto_vacuum", value: newValue) }
+    }
+
+    /// The journaling mode used by the database. The default is `.memory` for in-memory databases and `.wal` for file-backed databases.
+    public var journalMode: JournalMode {
+        get { get(pragma: "journal_mode") }
+        set { set(pragma: "journal_mode", value: newValue) }
+    }
+    
+    /// The method used when deleting data.
+    public var secureDelete: SecureDelete {
+        get { get(pragma: "secure_delete") }
+        set { set(pragma: "secure_delete", value: newValue) }
+    }
+    
     internal let db: SQLiteDatabase
     private var isOpen: Bool
     
@@ -46,52 +64,26 @@ public class Restructure {
     
     /// A number stored along with the database, typically used for schema versioning
     public internal(set) var userVersion: Int {
-        get {
-            do {
-                let statement = try prepare(query: "PRAGMA user_version")
-                let result = statement.step()
-                
-                switch result {
-                case let .row(row):
-                    return row[0]
-                default:
-                    fatalError("Failed to fetch user_version pragma from a result: \(result)")
-                }
-            } catch {
-                fatalError("Failed to fetching user_version pragma: \(error)")
-            }
-        }
-        
-        set {
-            let result = sqlite3_exec(db, "PRAGMA user_version = \(newValue)", nil, nil, nil)
-            
-            if result != SQLITE_OK {
-                let error = RestructureError.from(result: result)
-                fatalError("Failed to set the user_version: \(error)")
-            }
-        }
+        get { get(pragma: "user_version") }
+        set { set(pragma: "user_version", value: newValue) }
     }
     
     
     // MARK: - Initialization
     
-    /**
-        Initializes a new Structure object with all data stored in memory. No data will be persisted.
-     
-        - Throws: `StructureError.InternalError` if opening the database fails.
-     */
+    /// Initializes a new Structure object with all data stored in memory. No data will be persisted.
+    ///
+    /// - Throws: `StructureError.InternalError` if opening the database fails.
     convenience public init() throws {
         try self.init(path: ":memory:")
     }
     
-    /**
-        Initializes a new Structure object at the given path. If the file already exists, it will be opened, otherwise it will be created.
-     
-        - Parameter path: The full path to the Structure object to open or create.
-     
-        - Throws: `StructureError.InternalError` if opening the database fails.
-     */
-    required public init(path: String) throws {
+    /// Initializes a new Structure object at the given path. If the file already exists, it will be opened, otherwise it will be created.
+    ///
+    /// - Parameter path: The full path to the Structure object to open or create.
+    ///
+    /// - Throws: `StructureError.InternalError` if opening the database fails.
+    required public init(path: String, journalMode: JournalMode = .wal) throws {
         // Build the database object
         var db: SQLiteDatabase? = nil
         let result = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nil)
@@ -113,7 +105,11 @@ public class Restructure {
             self.path = nil
         } else {
             self.path = path
+            
         }
+
+        // Set up the database settings
+        self.journalMode = journalMode
         
         // Register all of the custom functions
         registerFunctions()
@@ -170,14 +166,11 @@ public class Restructure {
     
     // MARK: - Querying
     
-    /**
-        Simply executes a statement with a success / failure result.
- 
-        - Parameter query: The SQL statement to execute
- 
-        - Throws: `StructureError.InternalError` if the execution failed.
-    */
-    
+    /// Simply executes a statement with a success / failure result.
+    ///
+    /// - Parameter query: The SQL statement to execute
+    ///
+    /// - Throws: `StructureError.InternalError` if the execution failed.
     public func execute(query: String) throws {
         var errorMessage: UnsafeMutablePointer<Int8>? = nil
         let result = sqlite3_exec(db, query, nil, nil, &errorMessage)
@@ -197,15 +190,13 @@ public class Restructure {
         }
     }
     
-    /**
-        Prepare a new `Statement` for the database
-     
-        - Parameter query: The SQL statement to prepare
-     
-        - Throws: `StructureError.InternalError` if the statement cannot be parsed.
-     
-        - Returns: An unexecuted, unbound statement.
-     */
+    /// Prepare a new `Statement` for the database
+    ///
+    /// - Parameter query: The SQL statement to prepare
+    ///
+    /// - Throws: `StructureError.InternalError` if the statement cannot be parsed.
+    ///
+    /// - Returns: An unexecuted, unbound statement.
     public func prepare(query: String) throws -> Statement {
         let statement = try Statement(restructure: self, query: query)
         statement.arrayStrategy = arrayStrategy
@@ -244,13 +235,11 @@ public class Restructure {
         sqlite3_exec(db, "ROLLBACK TRANSACTION", nil, nil, nil)
     }
     
-    /**
-        Perform the given block in a transaction, rolling back on an error.
-     
-        - Parameter transactionBlock: A block of statements to perform in a transaction.
-     
-        - Throws: An `Error` if the block throws, which results in rolling back any statements in the transaction.
-     */
+    /// Perform the given block in a transaction, rolling back on an error.
+    ///
+    /// - Parameter transactionBlock: A block of statements to perform in a transaction.
+    ///
+    /// - Throws: An `Error` if the block throws, which results in rolling back any statements in the transaction.
     public func transaction(_ transactionBlock: (Restructure) throws -> ()) throws {
         var potentialError: Error? = nil
         
@@ -271,28 +260,24 @@ public class Restructure {
     
     // MARK: - Migration
     
-    /**
-        Does the database need migrated to the target version?
- 
-        - Parameter targetVersion: The target migration version to test for.
- 
-        - Returns: `true` if the database would need migrated, otherwise `false`.
-    */
+    /// Does the database need migrated to the target version?
+    ///
+    /// - Parameter targetVersion: The target migration version to test for.
+    ///
+    /// - Returns: `true` if the database would need migrated, otherwise `false`.
     public func needsMigration(targetVersion: Int) -> Bool {
         return userVersion < targetVersion
     }
     
-    /**
-        Perform a schema migration, if applicable.
-     
-        - Parameter version: The version of the given migration, to determine whether the migration should be run.
-     
-        - Parameter migration: A block of statements to perform the migration.
-     
-        - Throws: An `Error` if the migration failed, or was performed out of order.
-     
-        - Note: Migrations affect the `userVersion` of the database. Migrations that have already run are ignored.
-     */
+    /// Perform a schema migration, if applicable.
+    ///
+    /// - Parameter version: The version of the given migration, to determine whether the migration should be run.
+    ///
+    /// - Parameter migration: A block of statements to perform the migration.
+    ///
+    /// - Throws: An `Error` if the migration failed, or was performed out of order.
+    ///
+    /// - Note: Migrations affect the `userVersion` of the database. Migrations that have already run are ignored.
     public func migrate(version: Int, migration: (Restructure) throws -> ()) throws {
         // Skip if this migration has already run
         guard userVersion < version else {
@@ -309,5 +294,62 @@ public class Restructure {
         
         // Increment the user version on success
         userVersion += 1
+    }
+    
+    // MARK: - Utilities
+    
+    /// Get a value for a given pragma
+    private func get<T: PragmaRepresentable>(pragma: String) -> T {
+        do {
+            let statement = try prepare(query: "PRAGMA \(pragma)")
+            let result = statement.step()
+            
+            switch result {
+            case let .row(row):
+                return T.from(value: row[0])
+            default:
+                fatalError("Failed to fetch \(pragma) pragma from a result: \(result)")
+            }
+        } catch {
+            fatalError("Failed to fetch \(pragma) pragma: \(error)")
+        }
+    }
+    
+    /// Set the value of a pragma
+    private func set<T: PragmaRepresentable>(pragma: String, value: T) {
+        let result = sqlite3_exec(db, "PRAGMA \(pragma) = \(value.pragmaValue)", nil, nil, nil)
+        
+        if result != SQLITE_OK {
+            let error = RestructureError.from(result: result)
+            fatalError("Failed to set \(pragma): \(error)")
+        }
+    }
+    
+    /// Send an incremental vacuum request to clean the given amount of pages
+    public func incrementalVacuum(pages: Int = 0) {
+        let query: String
+        
+        if pages < 1 {
+            query = "PRAGMA incremental_vacuum"
+        } else {
+            query = "PRAGMA incremental_vacuum(\(pages))"
+        }
+        
+        let result = sqlite3_exec(db, query, nil, nil, nil)
+        
+        if result != SQLITE_OK {
+            let error = RestructureError.from(result: result)
+            fatalError("Failed to incremental vacuum: \(error)")
+        }
+    }
+    
+    /// Perform a vacuum operation on the database.
+    public func vacuum() {
+        let result = sqlite3_exec(db, "VACUUM", nil, nil, nil)
+        
+        if result != SQLITE_OK {
+            let error = RestructureError.from(result: result)
+            fatalError("Failed to vacuum: \(error)")
+        }
     }
 }
