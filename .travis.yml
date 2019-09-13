@@ -1,7 +1,7 @@
 language: objective-c
 
 os: osx
-osx_image: xcode10.2
+osx_image: xcode11
 
 xcode_project: Restructure.xcodeproj
 
@@ -11,24 +11,24 @@ xcode_scheme:
     - Restructure tvOS
 
 xcode_sdk:
-    - iphonesimulator12.2
-    - macosx10.14
-    - appletvsimulator12.2
+    - iphonesimulator13.0
+    - macosx10.15
+    - appletvsimulator13.0
 
 matrix:
     exclude:
         - xcode_scheme: Restructure iOS
-          xcode_sdk: macosx10.14
+          xcode_sdk: macosx10.15
         - xcode_scheme: Restructure iOS
-          xcode_sdk: appletvsimulator12.2
+          xcode_sdk: appletvsimulator13.0
         - xcode_scheme: Restructure macOS
-          xcode_sdk: iphonesimulator12.2
+          xcode_sdk: iphonesimulator13.0
         - xcode_scheme: Restructure macOS
-          xcode_sdk: appletvsimulator12.2
+          xcode_sdk: appletvsimulator13.0
         - xcode_scheme: Restructure tvOS
-          xcode_sdk: iphonesimulator12.2
+          xcode_sdk: iphonesimulator13.0
         - xcode_scheme: Restructure tvOS
-          xcode_sdk: macosx10.14
+          xcode_sdk: macosx10.15
 
 script:
-    - xcodebuild clean build -sdk "${TRAVIS_XCODE_SDK}" -project "${TRAVIS_XCODE_PROJECT}" -scheme "${TRAVIS_XCODE_SCHEME}" CODE_SIGNING_REQUIRED=NO
+    - swift test

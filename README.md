@@ -1,7 +1,7 @@
 #  Restructure
 
-[![Build Status](https://travis-ci.org/stack/Restructure.svg?branch=develop)](https://travis-ci.org/stack/Restructure)
-![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg)
+[![Build Status](https://travis-ci.org/stack/Restructure.svg?branch=swift-5.1)](https://travis-ci.org/stack/Restructure)
+![Swift 5.1](https://img.shields.io/badge/Swift-5.0-orange.svg)
 
 Restructure is a wrapper library for [SQLite](https://sqlite.org/index.html) for
 iOS, macOS, and tvOS. It's fairly opinionated, as in, it does exactly what I
@@ -9,15 +9,8 @@ want it to do. Feel free to use it, fork it, or do what you would like with it.
 
 ## Installation
 
-Adding this repository as a git submodule is the only way to use the library.
-
-1.  Add this repository as a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
-2.  Check out the tag or branch you wish to use.
-3.  Add the `Restructure.xcodeproj` project to your existing project.
-4.  Add the appropriate framework to your Linked Frameworks and Libraries.
-
-In the future, when the dust has settled from WWDC '19, support for Swift
-Package Manager will be added.
+Starting at version 2.0.0, Restructure is a [Swift Package Manager](https://swift.org/package-manager/)
+project. Use the appropriate tools to include Restructure in to your project.
 
 ## Usage
 

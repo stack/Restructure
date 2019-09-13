@@ -21,15 +21,12 @@ public class StatementEncoder {
     
     // MARK: - Encoding
 
-    /**
-        Encodes an Encodable to a Statement.
-     
-        - Parameter value: The `Encodable` to to encode to a statement.
-     
-        - Parameter to: The `Statement` to encode to.
-     
-        - Throws: `Error` if the encoding cannot happen.
-     */
+    /// Encodes an Encodable to a Statement.
+    ///
+    /// - Parameter value: The `Encodable` to to encode to a statement.
+    /// - Parameter to: The `Statement` to encode to.
+    ///
+    /// - Throws: `Error` if the encoding cannot happen.
     public func encode<T: Encodable>(_ value: T, to statement: Statement) throws {
         let encoder = _StatementEncoder(statement: statement)
         try value.encode(to: encoder)
