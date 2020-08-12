@@ -1,7 +1,7 @@
 language: objective-c
 
 os: osx
-osx_image: xcode11
+osx_image: xcode11.6
 
 xcode_project: Restructure.xcodeproj
 
@@ -11,22 +11,22 @@ xcode_scheme:
     - Restructure tvOS
 
 xcode_sdk:
-    - iphonesimulator13.0
+    - iphonesimulator13.6
     - macosx10.15
-    - appletvsimulator13.0
+    - appletvsimulator13.4
 
 matrix:
     exclude:
         - xcode_scheme: Restructure iOS
           xcode_sdk: macosx10.15
         - xcode_scheme: Restructure iOS
-          xcode_sdk: appletvsimulator13.0
+          xcode_sdk: appletvsimulator13.4
         - xcode_scheme: Restructure macOS
-          xcode_sdk: iphonesimulator13.0
+          xcode_sdk: iphonesimulator13.6
         - xcode_scheme: Restructure macOS
-          xcode_sdk: appletvsimulator13.0
+          xcode_sdk: appletvsimulator13.4
         - xcode_scheme: Restructure tvOS
-          xcode_sdk: iphonesimulator13.0
+          xcode_sdk: iphonesimulator13.6
         - xcode_scheme: Restructure tvOS
           xcode_sdk: macosx10.15
 
