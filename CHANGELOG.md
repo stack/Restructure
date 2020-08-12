@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 2.1.0 [Unreleased]
 ### Added
 -   `sqliteVersion` fetches the underlying SQLite version string.
+-   Dynamic member lookup is enabled for `Row`, allowing for direct access to values via property notation.
 
 ### Removed
 -   `JournalMode.off` has been removed because of defensive configs.

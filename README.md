@@ -185,6 +185,23 @@ for row in statement }
 }
 ```
 
+
+### Rows support Dynamic Member Lookup
+
+You can extract data from a row with direct property access using Dynamic Member Lookup.
+
+```swift
+let statement = try! restructure.prepare(query: "SELECT a, b, c, d, e FROM foo LIMIT 1")
+
+guard case let .row(row) = statement.step() else {
+    /// Handle error
+}
+
+let a: Int = row.a
+let b: String = row.b
+let c: Double = row.c
+```
+
 ### Migrations
 
 The Restructure object has a `userVersion` property to track the version of a

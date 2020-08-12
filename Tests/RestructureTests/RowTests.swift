@@ -819,4 +819,63 @@ class RowTests: XCTestCase {
         XCTAssertNotNil(data2)
         XCTAssertEqual(data1, data2!)
     }
+
+
+    // MARK: - Dynamic Member Tests
+
+    func testDynamicMembers() {
+        try! restructure.execute(query: "CREATE TABLE foo (a INT, t TEXT)")
+        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, t) VALUES (:a, :t)")
+
+        insertStatement.bind(value: 0, for: "a")
+        insertStatement.bind(value: "Text 0", for: "t")
+        _ = insertStatement.step()
+
+        insertStatement.reset()
+
+        insertStatement.bind(value: 1, for: "a")
+        insertStatement.bind(value: "Text 1", for: "t")
+        _ = insertStatement.step()
+
+        insertStatement.reset()
+
+        insertStatement.bind(value: 2, for: "a")
+        insertStatement.bind(value: "Text 2", for: "t")
+        _ = insertStatement.step()
+
+        let selectStatement = try! restructure.prepare(query: "SELECT a, t FROM foo ORDER BY t")
+
+        guard case let .row(row1) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+
+        let row1Int: Int = row1.a
+        let row1String: String = row1.t
+
+        XCTAssertEqual(row1Int, 0)
+        XCTAssertEqual(row1String, "Text 0")
+
+        guard case let .row(row2) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+
+        let row2Int: Int = row2.a
+        let row2String: String = row2.t
+
+        XCTAssertEqual(row2Int, 1)
+        XCTAssertEqual(row2String, "Text 1")
+
+        guard case let .row(row3) = selectStatement.step() else {
+            XCTFail("Failed to fetch row")
+            return
+        }
+
+        let row3Int: Int = row3.a
+        let row3String: String = row3.t
+
+        XCTAssertEqual(row3Int, 2)
+        XCTAssertEqual(row3String, "Text 2")
+    }
 }

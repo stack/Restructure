@@ -10,6 +10,7 @@ import Foundation
 import SQLite3
 
 /// A row result from a `Statement`.
+@dynamicMemberLookup
 public class Row {
     
     // MARK: - Properties
@@ -78,6 +79,15 @@ public class Row {
         
         return self[Int(index)]
     }
+
+    /// Returns the non-null `Structurable` value via dynamic look up
+    ///
+    /// - Parameter dynamicMember: The dynamic member to look for.
+    ///
+    /// - Returns: The `Structurable` value associated with the key, transformated by the underlying SQLite API if necessary.
+    public subscript<T: Structurable>(dynamicMember key: String) -> T {
+        return self[key]
+    }
     
     ///Returns the nullable `Structurable` value for the given index value.
     ///
@@ -105,5 +115,14 @@ public class Row {
         }
         
         return self[Int(index)]
+    }
+
+    /// Returns the nullable `Structurable` value via dynamic look up
+    ///
+    /// - Parameter dynamicMember: The dynamic member to look for.
+    ///
+    /// - Returns: The `Structurable` value associated with the key, transformated by the underlying SQLite API if necessary.
+    public subscript<T: Structurable>(dynamicMember key: String) -> T? {
+        return self[key]
     }
 }
