@@ -67,6 +67,23 @@ public class Restructure {
         get { get(pragma: "user_version") }
         set { set(pragma: "user_version", value: newValue) }
     }
+
+    /// The underlying SQLite version {
+    public var sqliteVersion: String {
+        do {
+            let statement = try prepare(query: "SELECT sqlite_version()")
+            let result = statement.step()
+
+            switch result {
+            case let .row(row):
+                return row[0]
+            default:
+                fatalError("Failed to fetch sqlite_version from a result: \(result)")
+            }
+        } catch {
+            fatalError("Failed to fetch sqlite_version: \(error)")
+        }
+    }
     
     
     // MARK: - Initialization

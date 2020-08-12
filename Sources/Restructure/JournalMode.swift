@@ -20,8 +20,6 @@ public enum JournalMode: CaseIterable, PragmaRepresentable {
     case memory
     /// A write-ahead log is used as opposed to a rollback journal. This is the default for a file-backed database.
     case wal
-    /// No rollback journal is used.
-    case off
     
     /// Create a `JournalMode` from a SQlite representation
     static func from(value: String) -> JournalMode {
@@ -36,8 +34,6 @@ public enum JournalMode: CaseIterable, PragmaRepresentable {
             return .memory
         case "WAL":
             return .wal
-        case "OFF":
-            return .off
         default:
             fatalError("Unsupported JournalMode string: \(value)")
         }
@@ -56,8 +52,6 @@ public enum JournalMode: CaseIterable, PragmaRepresentable {
             return "MEMORY"
         case .wal:
             return "WAL"
-        case .off:
-            return "OFF"
         }
     }
 }

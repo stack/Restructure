@@ -71,6 +71,13 @@ class RestructureTests: XCTestCase {
         XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b INT); INSERT INTO foo (b) VALUES(42);"))
         XCTAssertGreaterThan(restructure.lastInsertedId, 0)
     }
+
+    // MARK: - SQLite Version Tests
+
+    func testSQLiteVersionExists() {
+        let version = restructure.sqliteVersion
+        XCTAssertFalse(version.isEmpty)
+    }
     
     
     // MARK: - Migration Tests
