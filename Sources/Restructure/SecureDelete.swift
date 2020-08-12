@@ -3,7 +3,7 @@
 //  Restructure
 //
 //  Created by Stephen H. Gerstacker on 8/12/19.
-//  Copyright @ 2019 Stephen H. Gerstacker. All rights reserved.
+//  Copyright @ 2020 Stephen H. Gerstacker. All rights reserved.
 //
 
 import Foundation
