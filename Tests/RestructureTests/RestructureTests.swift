@@ -3,7 +3,7 @@
 //  Restructure macOS Tests
 //
 //  Created by Stephen H. Gerstacker on 11/3/18.
-//  Copyright @ 2019 Stephen H. Gerstacker. All rights reserved.
+//  Copyright @ 2020 Stephen H. Gerstacker. All rights reserved.
 //
 
 import XCTest
@@ -70,6 +70,13 @@ class RestructureTests: XCTestCase {
     func testLastInsertedIdReturnsNonZeroWithInserts() {
         XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b INT); INSERT INTO foo (b) VALUES(42);"))
         XCTAssertGreaterThan(restructure.lastInsertedId, 0)
+    }
+
+    // MARK: - SQLite Version Tests
+
+    func testSQLiteVersionExists() {
+        let version = restructure.sqliteVersion
+        XCTAssertFalse(version.isEmpty)
     }
     
     

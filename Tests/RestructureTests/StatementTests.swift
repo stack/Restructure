@@ -3,7 +3,7 @@
 //  Restructure
 //
 //  Created by Stephen H. Gerstacker on 11/4/18.
-//  Copyright @ 2019 Stephen H. Gerstacker. All rights reserved.
+//  Copyright @ 2020 Stephen H. Gerstacker. All rights reserved.
 //
 
 import XCTest
@@ -70,7 +70,7 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: 42.1, for: "C")
         insertStatement.bind(value: 42, for: "D")
         
-        let data = Data(bytes: UnsafePointer<UInt8>([ 0x41, 0x42, 0x43 ] as [UInt8]), count: 3)
+        let data = Data(bytes: [0x41, 0x42, 0x43], count: 3)
         insertStatement.bind(value: data, for: "E")
         
         XCTAssertNoThrow(try insertStatement.perform())
@@ -103,7 +103,7 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: 42.1, for: "C")
         insertStatement.bind(value: 42, for: "D")
         
-        let data = Data(bytes: UnsafePointer<UInt8>([ 0x41, 0x42, 0x43 ] as [UInt8]), count: 3)
+        let data = Data(bytes: [0x41, 0x42, 0x43 ], count: 3)
         insertStatement.bind(value: data, for: "E")
         
         XCTAssertNoThrow(try insertStatement.perform())
@@ -210,7 +210,7 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: 42.1, for: "C")
         insertStatement.bind(value: 42, for: "D")
         
-        let data = Data(bytes: UnsafePointer<UInt8>([ 0x41, 0x42, 0x43 ] as [UInt8]), count: 3)
+        let data = Data(bytes: [0x41, 0x42, 0x43], count: 3)
         insertStatement.bind(value: data, for: "E")
         
         XCTAssertNoThrow(try insertStatement.perform())
@@ -231,7 +231,7 @@ class StatementTests: XCTestCase {
         updateStatement.bind(value: 2, for: "D")
         updateStatement.bind(value: lastId, for: "A")
         
-        let data2 = Data(bytes: UnsafePointer<UInt8>([ 0x44, 0x45, 0x46 ] as [UInt8]), count: 3)
+        let data2 = Data(bytes: [0x44, 0x45, 0x46], count: 3)
         updateStatement.bind(value: data2, for: "E")
         
         XCTAssertNoThrow(try updateStatement.perform())
@@ -287,7 +287,7 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: 1.1, for: "C")
         insertStatement.bind(value: 1, for: "D")
         
-        let data1 = Data(bytes: UnsafePointer<UInt8>([ 0x01 ] as [UInt8]), count: 1)
+        let data1 = Data(bytes: [0x01], count: 1)
         insertStatement.bind(value: data1, for: "E")
         
         XCTAssertNoThrow(try insertStatement.perform())
@@ -299,7 +299,7 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: 2.2, for: "C")
         insertStatement.bind(value: 2, for: "D")
         
-        let data2 = Data(bytes: UnsafePointer<UInt8>([ 0x02 ] as [UInt8]), count: 1)
+        let data2 = Data(bytes: [0x02], count: 1)
         insertStatement.bind(value: data2, for: "E")
         
         XCTAssertNoThrow(try insertStatement.perform())
@@ -312,7 +312,7 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: 3.3, for: "C")
         insertStatement.bind(value: 3, for: "D")
         
-        let data3 = Data(bytes: UnsafePointer<UInt8>([ 0x03 ] as [UInt8]), count: 1)
+        let data3 = Data(bytes: [0x03], count: 1)
         insertStatement.bind(value: data3, for: "E")
         
         XCTAssertNoThrow(try insertStatement.perform())

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.1.0 2020-08-16
+### Added
+-   `sqliteVersion` fetches the underlying SQLite version string.
+-   Dynamic member lookup is enabled for `Row`, allowing for direct access to values via property notation.
+
+### Removed
+-   `JournalMode.off` has been removed because of defensive configs.
+
 ## 2.0.0 - 2019-09-12
 ### Added
 -   `AutoVacuum` dictates the automatic vacuuming mode.

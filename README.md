@@ -1,7 +1,7 @@
 #  Restructure
 
-[![Build Status](https://travis-ci.org/stack/Restructure.svg?branch=swift-5.1)](https://travis-ci.org/stack/Restructure)
-![Swift 5.1](https://img.shields.io/badge/Swift-5.0-orange.svg)
+[![Build Status](https://travis-ci.org/stack/Restructure.svg)](https://travis-ci.org/stack/Restructure)
+![Swift 5.1](https://img.shields.io/badge/Swift-5.1-orange.svg)
 
 Restructure is a wrapper library for [SQLite](https://sqlite.org/index.html) for
 iOS, macOS, and tvOS. It's fairly opinionated, as in, it does exactly what I
@@ -183,6 +183,23 @@ let decoder = RowDecoder()
 for row in statement }
     let foo = try! decoder.decode(Foo.self, from: row)
 }
+```
+
+
+### Rows support Dynamic Member Lookup
+
+You can extract data from a row with direct property access using Dynamic Member Lookup.
+
+```swift
+let statement = try! restructure.prepare(query: "SELECT a, b, c, d, e FROM foo LIMIT 1")
+
+guard case let .row(row) = statement.step() else {
+    /// Handle error
+}
+
+let a: Int = row.a
+let b: String = row.b
+let c: Double = row.c
 ```
 
 ### Migrations
