@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.1.1 2023-09-07
+### Fixed
+-   Storing a `Statement` no longer causes a crash when cleaning up.
+-   The `UPPER` function properly handles memory management of strings.
+
 ## 2.1.0 2020-08-16
 ### Added
 -   `sqliteVersion` fetches the underlying SQLite version string.

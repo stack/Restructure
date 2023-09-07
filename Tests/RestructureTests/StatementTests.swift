@@ -23,6 +23,21 @@ class StatementTests: XCTestCase {
         restructure = nil
     }
 
+    // MARK: - Finalzie Tests
+    
+    func testFinalizeStoredStatement() throws {
+        var restructure: Restructure? = try! Restructure()
+        try! restructure!.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT)")
+        
+        var statement: Statement? = try restructure!.prepare(query: "SELECT a FROM foo")
+        
+        restructure?.close()
+        restructure = nil
+        
+        statement = nil
+        
+        XCTSuccess("Completely freed stored statements")
+    }
     
     // MARK: - Prepare Tests
     

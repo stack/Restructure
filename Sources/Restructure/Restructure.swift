@@ -177,7 +177,10 @@ public class Restructure {
             }
             
             let stringValue = String(cString: value).uppercased()
-            sqlite3_result_text(context, stringValue, Int32(stringValue.utf8.count), SQLITE_STATIC)
+            
+            stringValue.withCString { value in
+                sqlite3_result_text(context, value, Int32(stringValue.utf8.count), SQLITE_TRANSIENT)
+            }
         }, nil, nil)
     }
     
@@ -225,6 +228,8 @@ public class Restructure {
     }
     
     internal func finalize(statement: Statement) {
+        guard preparedStatements.contains(statement.statement) else { return }
+        
         preparedStatements.remove(statement.statement)
         
         let result = sqlite3_finalize(statement.statement)
