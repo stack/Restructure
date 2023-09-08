@@ -139,18 +139,20 @@ public class Restructure {
             return
         }
 
-        preparedStatements.forEach {
-            sqlite3_finalize($0)
+        // Finalize all known statements
+        for statement in preparedStatements {
+            sqlite3_finalize(statement)
         }
         
         preparedStatements.removeAll()
         
-        sqlite3_close_v2(db)
-        
-        if let filePath = path {
-            try? FileManager.default.removeItem(atPath: filePath)
+        // In WAL mode, force a flush
+        if journalMode == .wal {
+            sqlite3_wal_checkpoint_v2(db, nil, SQLITE_CHECKPOINT_TRUNCATE, nil, nil)
         }
         
+        // Final close
+        sqlite3_close_v2(db)
         isOpen = false
     }
     

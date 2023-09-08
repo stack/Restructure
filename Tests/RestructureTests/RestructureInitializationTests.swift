@@ -54,24 +54,6 @@ class RestructureInitializationTests: XCTestCase {
         XCTAssertNotNil(restructure)
     }
     
-    func testClosingTemporaryDeletedFile() {
-        // Ensure the file doesn't exist
-        XCTAssertFalse(FileManager.default.fileExists(atPath: tempPath))
-        
-        // Build the structure
-        restructure = try! Restructure(path: tempPath)
-        restructure!.isTemporary = true
-        
-        // Ensure the file does exist
-        XCTAssertTrue(FileManager.default.fileExists(atPath: tempPath))
-        
-        // Close and clean up
-        restructure!.close()
-        
-        // Ensure the file doesn't exist
-        XCTAssertFalse(FileManager.default.fileExists(atPath: tempPath))
-    }
-    
     func testJournalModeDefault() {
         restructure = try! Restructure(path: tempPath)
         XCTAssertEqual(restructure!.journalMode, .wal)
