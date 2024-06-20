@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.10
 import PackageDescription
 
 let package = Package(
@@ -13,10 +13,17 @@ let package = Package(
         ),
     ],
     targets: [
-        .target(name: "Restructure"),
+        .target(
+            name: "Restructure",
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]),
         .testTarget(
             name: "RestructureTests",
-            dependencies: ["Restructure"]
+            dependencies: ["Restructure"],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]
         ),
     ]
 )
