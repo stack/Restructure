@@ -233,4 +233,72 @@ class StatementEncoderTests: XCTestCase {
         
         XCTAssertEqual(row["type"], 1)
     }
+    
+    func testEncodingNil() throws {
+        struct Foo: Encodable {
+            let id: Int64
+            let name: String?
+            let value: Int?
+        }
+        
+        try restructure.execute(query: "CREATE TABLE foobar (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NULL, value INTEGER NULL)")
+        
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foobar (id, name, value) VALUES (:id, :name, :value)")
+        let encoder = StatementEncoder()
+        
+        let foo1 = Foo(id: 1, name: "Hello", value: 42)
+        
+        insertStatement.reset()
+        try encoder.encode(foo1, to: insertStatement)
+        
+        guard case .done = insertStatement.step() else {
+            XCTFail("Failed to insert first row")
+            return
+        }
+        
+        let foo2 = Foo(id: 2, name: nil, value: 42)
+        
+        insertStatement.reset()
+        try encoder.encode(foo2, to: insertStatement)
+        
+        guard case .done = insertStatement.step() else {
+            XCTFail("Failed to insert second row")
+            return
+        }
+        
+        let foo3 = Foo(id: 3, name: "Hello", value: nil)
+        
+        insertStatement.reset()
+        try encoder.encode(foo3, to: insertStatement)
+        
+        guard case .done = insertStatement.step() else {
+            XCTFail("Failed to insert second row")
+            return
+        }
+        
+        let fetchAllStatement = try restructure.prepare(query: "SELECT COUNT(id) AS count FROM foobar")
+        
+        guard case .row(let allRow) = fetchAllStatement.step(), let allCount: Int = allRow["count"] else {
+            XCTFail("Failed to get all count")
+            return
+        }
+        
+        let fetchNilNameStatement = try restructure.prepare(query: "SELECT COUNT(id) AS count FROM foobar WHERE name IS NULL")
+        
+        guard case .row(let nilNameRow) = fetchNilNameStatement.step(), let nilNameCount: Int = nilNameRow["count"] else {
+            XCTFail("Failed to get nil name count")
+            return
+        }
+        
+        let fetchNilValueStatement = try restructure.prepare(query: "SELECT COUNT(id) AS count FROM foobar WHERE value IS NULL")
+        
+        guard case .row(let nilValueRow) = fetchNilValueStatement.step(), let nilValueCount: Int = nilValueRow["count"] else {
+            XCTFail("Failed to get nil value count")
+            return
+        }
+        
+        XCTAssertEqual(allCount, 3)
+        XCTAssertEqual(nilNameCount, 1)
+        XCTAssertEqual(nilValueCount, 1)
+    }
 }

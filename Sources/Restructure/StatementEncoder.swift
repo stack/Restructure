@@ -175,56 +175,168 @@ fileprivate struct _StatementEncodingContainer<K : CodingKey> : KeyedEncodingCon
         statement.bind(value: value, for: key.stringValue)
     }
     
+    mutating func encodeIfPresent(_ value: Bool?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
+    }
+    
     mutating func encode(_ value: String, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encodeIfPresent(_ value: String?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
     }
     
     mutating func encode(_ value: Double, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
     }
     
+    mutating func encodeIfPresent(_ value: Double?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
+    }
+    
     mutating func encode(_ value: Float, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encodeIfPresent(_ value: Float?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
     }
     
     mutating func encode(_ value: Int, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
     }
     
+    mutating func encodeIfPresent(_ value: Int?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
+    }
+    
     mutating func encode(_ value: Int8, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encodeIfPresent(_ value: Int8?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
     }
     
     mutating func encode(_ value: Int16, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
     }
     
+    mutating func encodeIfPresent(_ value: Int16?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
+    }
+    
     mutating func encode(_ value: Int32, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encodeIfPresent(_ value: Int32?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
     }
     
     mutating func encode(_ value: Int64, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
     }
     
+    mutating func encodeIfPresent(_ value: Int64?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
+    }
+    
     mutating func encode(_ value: UInt, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encodeIfPresent(_ value: UInt?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
     }
     
     mutating func encode(_ value: UInt8, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
     }
     
+    mutating func encodeIfPresent(_ value: UInt8?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
+    }
+    
     mutating func encode(_ value: UInt16, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
+    }
+    
+    mutating func encodeIfPresent(_ value: UInt16?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
     }
     
     mutating func encode(_ value: UInt32, forKey key: K) throws {
         statement.bind(value: value, for: key.stringValue)
     }
     
+    mutating func encodeIfPresent(_ value: UInt32?, forKey key: K) throws {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
+        }
+    }
+    
     mutating func encode(_ value: UInt64, forKey key: K) throws {
         throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath, debugDescription: "Encoding UInt64 is not supported"))
+    }
+    
+    mutating func encodeIfPresent(_ value: UInt64?, forKey key: K) throws {
+        if let value {
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath, debugDescription: "Encoding UInt64 is not supported"))
+        } else {
+            try encodeNil(forKey: key)
+        }
     }
     
     mutating func encode<T>(_ value: T, forKey key: K) throws where T : Encodable {
@@ -235,6 +347,14 @@ fileprivate struct _StatementEncodingContainer<K : CodingKey> : KeyedEncodingCon
             defer { encoder.codingPath.removeLast() }
             try! value.encode(to: self.encoder)
             // throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath, debugDescription: "Encoding \(value) is not supported"))
+        }
+    }
+    
+    mutating func encodeIfPresent<T>(_ value: T?, forKey key: K) throws where T : Encodable {
+        if let value {
+            try encode(value, forKey: key)
+        } else {
+            try encodeNil(forKey: key)
         }
     }
     
