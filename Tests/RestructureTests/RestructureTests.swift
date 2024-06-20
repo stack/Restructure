@@ -3,7 +3,7 @@
 //  Restructure macOS Tests
 //
 //  Created by Stephen H. Gerstacker on 11/3/18.
-//  Copyright @ 2020 Stephen H. Gerstacker. All rights reserved.
+//  SPDX-License-Identifier: MIT
 //
 
 import XCTest

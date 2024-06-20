@@ -3,7 +3,7 @@
 //  Restructure
 //
 //  Created by Stephen H. Gerstacker on 11/6/18.
-//  Copyright @ 2020 Stephen H. Gerstacker. All rights reserved.
+//  SPDX-License-Identifier: MIT
 //
 
 import XCTest
