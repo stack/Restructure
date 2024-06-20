@@ -18,8 +18,8 @@ class RowTests: XCTestCase {
     
     // MARK: - Set Up & Tear Down
     
-    override func setUp() {
-        restructure = try! Restructure()
+    override func setUpWithError() throws {
+        restructure = try Restructure()
     }
 
     override func tearDown() {
@@ -29,9 +29,9 @@ class RowTests: XCTestCase {
     
     // MARK: - Boolean Tests
     
-    func testBool() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testBool() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: false, for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -43,7 +43,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 0, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -65,9 +65,9 @@ class RowTests: XCTestCase {
     
     // MARK: - Signed Integer Tests
     
-    func testInt() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testInt() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: Int(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -85,7 +85,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -113,9 +113,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, Int.max)
     }
     
-    func testInt8() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testInt8() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: Int8(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -133,7 +133,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -161,9 +161,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, Int8.max)
     }
     
-    func testInt16() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testInt16() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: Int16(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -181,7 +181,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -209,9 +209,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, Int16.max)
     }
     
-    func testInt32() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testInt32() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: Int32(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -229,7 +229,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -257,9 +257,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, Int32.max)
     }
     
-    func testInt64() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testInt64() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: Int64(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -277,7 +277,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -307,9 +307,9 @@ class RowTests: XCTestCase {
     
     // MARK: - Unsigned Integer Tests
     
-    func testUInt() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testUInt() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: UInt(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -327,7 +327,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -355,9 +355,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, UInt.max)
     }
     
-    func testUInt8() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testUInt8() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: UInt8(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -375,7 +375,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -403,9 +403,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, UInt8.max)
     }
     
-    func testUInt16() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testUInt16() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: UInt16(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -423,7 +423,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -451,9 +451,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, UInt16.max)
     }
     
-    func testUInt32() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testUInt32() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: UInt32(0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -471,7 +471,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -502,17 +502,17 @@ class RowTests: XCTestCase {
     
     // MARK: - Array Tests
     
-    func testArrayBinaryPList() {
+    func testArrayBinaryPList() throws {
         restructure.arrayStrategy = .bplist
         
-        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: [1, 2, 3], for: "a")
         insertStatement.bind(value: 0, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -522,17 +522,17 @@ class RowTests: XCTestCase {
         XCTAssertEqual(row["a"], [1, 2, 3])
     }
     
-    func testArrayJSON() {
+    func testArrayJSON() throws {
         restructure.arrayStrategy = .json
         
-        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: [1, 2, 3], for: "a")
         insertStatement.bind(value: 0, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -542,17 +542,17 @@ class RowTests: XCTestCase {
         XCTAssertEqual(row["a"], [1, 2, 3])
     }
     
-    func testMultiDimensionalArrayBinaryPList() {
+    func testMultiDimensionalArrayBinaryPList() throws {
         restructure.arrayStrategy = .bplist
         
-        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: [[1.0, 2.0, 3.0]], for: "a")
         insertStatement.bind(value: 0, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -562,17 +562,17 @@ class RowTests: XCTestCase {
         XCTAssertEqual(row["a"], [[1.0, 2.0, 3.0]])
     }
     
-    func testMultiDimensionalArrayJSON() {
+    func testMultiDimensionalArrayJSON() throws {
         restructure.arrayStrategy = .json
         
-        try! restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+        try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: [[1.0, 2.0, 3.0]], for: "a")
         insertStatement.bind(value: 0, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -584,9 +584,9 @@ class RowTests: XCTestCase {
     
     // MARK: - Real Tests
     
-    func testFloat() {
-        try! restructure.execute(query: "CREATE TABLE foo (a REAL, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testFloat() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a REAL, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: Float(0.0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -604,7 +604,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -632,9 +632,9 @@ class RowTests: XCTestCase {
         XCTAssertEqual(value3, Float.greatestFiniteMagnitude)
     }
     
-    func testDouble() {
-        try! restructure.execute(query: "CREATE TABLE foo (a REAL, p INT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
+    func testDouble() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a REAL, p INT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
         
         insertStatement.bind(value: Double(0.0), for: "a")
         insertStatement.bind(value: 0, for: "p")
@@ -652,7 +652,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: 2, for: "p")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
         
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -683,16 +683,16 @@ class RowTests: XCTestCase {
     
     // MARK: - Complex Tests
 
-    func testData() {
-        try! restructure.execute(query: "CREATE TABLE foo (a BLOB)")
+    func testData() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a BLOB)")
         
         let data1 = Data(bytes: [0x41, 0x42, 0x43], count: 3)
         
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
         insertStatement.bind(value: data1, for: "a")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -705,17 +705,17 @@ class RowTests: XCTestCase {
         XCTAssertEqual(data1, data2!)
     }
     
-    func testIntegerDate() {
+    func testIntegerDate() throws {
         let now =  Date()
         
-        try! restructure.execute(query: "CREATE TABLE foo (a INT)")
+        try restructure.execute(query: "CREATE TABLE foo (a INT)")
         
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
         insertStatement.dateStrategy = .integer
         insertStatement.bind(value: now, for: "a")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a from foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a from foo LIMIT 1")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -728,17 +728,17 @@ class RowTests: XCTestCase {
         XCTAssertEqual(date.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1.0)
     }
     
-    func testRealDate() {
+    func testRealDate() throws {
         let now =  Date()
         
-        try! restructure.execute(query: "CREATE TABLE foo (a REAL)")
+        try restructure.execute(query: "CREATE TABLE foo (a REAL)")
         
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
         insertStatement.dateStrategy = .real
         insertStatement.bind(value: now, for: "a")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a from foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a from foo LIMIT 1")
         selectStatement.dateStrategy = .real
         
         guard case let .row(row) = selectStatement.step() else {
@@ -752,17 +752,17 @@ class RowTests: XCTestCase {
         XCTAssertEqual(date.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1.0)
     }
     
-    func testTextDate() {
+    func testTextDate() throws {
         let now =  Date()
         
-        try! restructure.execute(query: "CREATE TABLE foo (a TEXT)")
+        try restructure.execute(query: "CREATE TABLE foo (a TEXT)")
         
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
         insertStatement.dateStrategy = .text
         insertStatement.bind(value: now, for: "a")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a from foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a from foo LIMIT 1")
         selectStatement.dateStrategy = .text
         
         guard case let .row(row) = selectStatement.step() else {
@@ -776,16 +776,16 @@ class RowTests: XCTestCase {
         XCTAssertEqual(date.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1.0)
     }
     
-    func testSimpleString() {
-        try! restructure.execute(query: "CREATE TABLE foo (a TEXT)")
+    func testSimpleString() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a TEXT)")
         
         let data1 = "Hello, World!"
         
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
         insertStatement.bind(value: data1, for: "a")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -798,16 +798,16 @@ class RowTests: XCTestCase {
         XCTAssertEqual(data1, data2!)
     }
     
-    func testEmojiString() {
-        try! restructure.execute(query: "CREATE TABLE foo (a TEXT)")
+    func testEmojiString() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a TEXT)")
         
         let data1 = "👨‍👨‍👧‍👧 Hello, World! 👋🏼"
         
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
         insertStatement.bind(value: data1, for: "a")
         _ = insertStatement.step()
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
         
         guard case let .row(row) = selectStatement.step() else {
             XCTFail("Failed to fetch row")
@@ -823,9 +823,9 @@ class RowTests: XCTestCase {
 
     // MARK: - Dynamic Member Tests
 
-    func testDynamicMembers() {
-        try! restructure.execute(query: "CREATE TABLE foo (a INT, t TEXT)")
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (a, t) VALUES (:a, :t)")
+    func testDynamicMembers() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT, t TEXT)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, t) VALUES (:a, :t)")
 
         insertStatement.bind(value: 0, for: "a")
         insertStatement.bind(value: "Text 0", for: "t")
@@ -843,7 +843,7 @@ class RowTests: XCTestCase {
         insertStatement.bind(value: "Text 2", for: "t")
         _ = insertStatement.step()
 
-        let selectStatement = try! restructure.prepare(query: "SELECT a, t FROM foo ORDER BY t")
+        let selectStatement = try restructure.prepare(query: "SELECT a, t FROM foo ORDER BY t")
 
         guard case let .row(row1) = selectStatement.step() else {
             XCTFail("Failed to fetch row")

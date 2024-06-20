@@ -13,9 +13,9 @@ class StatementTests: XCTestCase {
 
     var restructure: Restructure!
     
-    override func setUp() {
-        restructure = try! Restructure()
-        try! restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b TEXT, c REAL, d INT, e BLOB)")
+    override func setUpWithError() throws {
+        restructure = try Restructure()
+        try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b TEXT, c REAL, d INT, e BLOB)")
     }
 
     override func tearDown() {
@@ -26,26 +26,24 @@ class StatementTests: XCTestCase {
     // MARK: - Finalzie Tests
     
     func testFinalizeStoredStatement() throws {
-        var restructure: Restructure? = try! Restructure()
-        try! restructure!.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT)")
+        var restructure: Restructure? = try Restructure()
+        try restructure!.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT)")
         
-        var statement: Statement? = try restructure!.prepare(query: "SELECT a FROM foo")
+        let statement: Statement? = try restructure!.prepare(query: "SELECT a FROM foo")
         
         restructure?.close()
         restructure = nil
-        
-        statement = nil
         
         XCTSuccess("Completely freed stored statements")
     }
     
     // MARK: - Prepare Tests
     
-    func testPrepareInvalidStatement() {
+    func testPrepareInvalidStatement() throws {
         XCTAssertThrowsError(try restructure.prepare(query: "SELECT FOO BAR BAZ"))
     }
     
-    func testPrepareValidStatementWithBindables() {
+    func testPrepareValidStatementWithBindables() throws {
         var statement: Statement!
         XCTAssertNoThrow(statement = try restructure.prepare(query: "SELECT a, b, c FROM foo WHERE b IS :ONE OR b IS $TWO OR c IS @THREE"))
         
@@ -60,7 +58,7 @@ class StatementTests: XCTestCase {
         XCTAssertEqual(2, statement.columns["c"])
     }
     
-    func testPrepareValidStatementWithoutBindables() {
+    func testPrepareValidStatementWithoutBindables() throws {
         var statement: Statement!
         XCTAssertNoThrow(statement = try restructure.prepare(query: "SELECT a, b, c FROM foo WHERE b IS ? OR b IS ? OR c IS ?"))
             
@@ -75,7 +73,7 @@ class StatementTests: XCTestCase {
     
     // MARK: - Read / Write Tests
     
-    func testDeleteStatement() {
+    func testDeleteStatement() throws {
         var insertStatement: Statement!
         
         // Insert a row
@@ -91,7 +89,7 @@ class StatementTests: XCTestCase {
         XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
-        let initialCount = fooCount
+        let initialCount = try getFooCount()
         XCTAssertEqual(1, initialCount)
         
         // Delete all rows
@@ -101,13 +99,13 @@ class StatementTests: XCTestCase {
         XCTAssertNoThrow(try deleteStatement.perform())
         
         // Ensure we have 0 rows
-        let deletedCount = fooCount
+        let deletedCount = try getFooCount()
         XCTAssertEqual(0, deletedCount)
     }
     
-    func testInsertStatement() {
+    func testInsertStatement() throws {
         // Ensure we have no rows
-        let initialCount = fooCount
+        let initialCount = try getFooCount()
         XCTAssertEqual(0, initialCount)
         
         // Insert a row
@@ -124,7 +122,7 @@ class StatementTests: XCTestCase {
         XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
-        let updatedCount = fooCount
+        let updatedCount = try getFooCount()
         XCTAssertEqual(1, updatedCount)
         
         // Get the data that was inserted
@@ -165,9 +163,9 @@ class StatementTests: XCTestCase {
         XCTAssertEqual(data, eInt)
     }
     
-    func testInsertNull() {
+    func testInsertNull() throws {
         // Ensure we have no rows
-        let initialCount = fooCount
+        let initialCount = try getFooCount()
         XCTAssertEqual(0, initialCount)
         
         // Insert a row
@@ -187,7 +185,7 @@ class StatementTests: XCTestCase {
         XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
-        let updatedCount = fooCount
+        let updatedCount = try getFooCount()
         XCTAssertEqual(1, updatedCount)
         
         // Get the data that was inserted
@@ -216,7 +214,7 @@ class StatementTests: XCTestCase {
         XCTAssertNil(eValue)
     }
     
-    func testUpdateStatement() {
+    func testUpdateStatement() throws {
         // Insert a row
         var insertStatement: Statement!
         XCTAssertNoThrow(insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)"))
@@ -231,7 +229,7 @@ class StatementTests: XCTestCase {
         XCTAssertNoThrow(try insertStatement.perform())
         
         // Ensure we have 1 row
-        let initialCount = fooCount
+        let initialCount = try getFooCount()
         XCTAssertEqual(1, initialCount)
         
         // Get the data that was inserted
@@ -252,7 +250,7 @@ class StatementTests: XCTestCase {
         XCTAssertNoThrow(try updateStatement.perform())
         
         // Ensure there is still one row
-        let updatedCount = fooCount
+        let updatedCount = try getFooCount()
         XCTAssertEqual(1, updatedCount)
         
         // Ensure the updated values are set
@@ -293,9 +291,9 @@ class StatementTests: XCTestCase {
         XCTAssertEqual(data2, eInt)
     }
     
-    func testReturnsMultipleRows() {
+    func testReturnsMultipleRows() throws {
         // Build the insertion statement
-        let insertStatement = try! restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)")
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)")
         
         // Insert 1
         insertStatement.bind(value: "one", for: "B")
@@ -333,7 +331,7 @@ class StatementTests: XCTestCase {
         XCTAssertNoThrow(try insertStatement.perform())
         
         // Read rows
-        let selectStatement = try! restructure.prepare(query: "SELECT a, b, c, d, e FROM foo ORDER BY c ASC")
+        let selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo ORDER BY c ASC")
         
         // Read 1
         guard case let .row(row1) = selectStatement.step() else {
@@ -393,8 +391,8 @@ class StatementTests: XCTestCase {
         
     // MARK: - Utilities
     
-    private var fooCount: Int {
-        let statement = try! restructure.prepare(query: "SELECT COUNT(a) FROM foo")
+    private func getFooCount() throws -> Int {
+        let statement = try restructure.prepare(query: "SELECT COUNT(a) FROM foo")
         let result = statement.step()
         
         switch result {

@@ -13,8 +13,8 @@ class RestructureTests: XCTestCase {
     
     var restructure: Restructure!
 
-    override func setUp() {
-        restructure = try! Restructure()
+    override func setUpWithError() throws {
+        restructure = try Restructure()
     }
 
     override func tearDown() {
@@ -24,13 +24,13 @@ class RestructureTests: XCTestCase {
     
     // MARK: - User Version Tests
     
-    func testUserVersionStartsAtZero() {
-        restructure = try! Restructure()
+    func testUserVersionStartsAtZero() throws {
+        restructure = try Restructure()
         XCTAssertEqual(restructure!.userVersion, 0)
     }
     
-    func testUserVersionIsUpdatable() {
-        restructure = try! Restructure()
+    func testUserVersionIsUpdatable() throws {
+        restructure = try Restructure()
         restructure!.userVersion = 42
         
         XCTAssertEqual(restructure!.userVersion, 42)
@@ -38,18 +38,18 @@ class RestructureTests: XCTestCase {
     
     // MARK: - Execution Tests
     
-    func testExecutingInvalidQuery() {
+    func testExecutingInvalidQuery() throws {
         XCTAssertThrowsError(try restructure.execute(query: "FOO BAR BAZ"))
     }
     
-    func testExecutingValidQuery() {
+    func testExecutingValidQuery() throws {
         XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INT)"))
     }
     
-    func testExecutingMultipleValidQueries() {
+    func testExecutingMultipleValidQueries() throws {
         XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INT); INSERT INTO foo (a) VALUES(42);"))
         
-        let statement = try! restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
+        let statement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
         let result = statement.step()
         
         switch result {
@@ -63,18 +63,18 @@ class RestructureTests: XCTestCase {
     
     // MARK: - Last Inserted ID Tests
     
-    func testLastInsertedIdReturnsZeroWithNoInserts() {
+    func testLastInsertedIdReturnsZeroWithNoInserts() throws {
         XCTAssertEqual(0, restructure.lastInsertedId)
     }
     
-    func testLastInsertedIdReturnsNonZeroWithInserts() {
+    func testLastInsertedIdReturnsNonZeroWithInserts() throws {
         XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b INT); INSERT INTO foo (b) VALUES(42);"))
         XCTAssertGreaterThan(restructure.lastInsertedId, 0)
     }
 
     // MARK: - SQLite Version Tests
 
-    func testSQLiteVersionExists() {
+    func testSQLiteVersionExists() throws {
         let version = restructure.sqliteVersion
         XCTAssertFalse(version.isEmpty)
     }
@@ -82,7 +82,7 @@ class RestructureTests: XCTestCase {
     
     // MARK: - Migration Tests
     
-    func testMigrationNeedDetectable() {
+    func testMigrationNeedDetectable() throws {
         XCTAssertFalse(restructure.needsMigration(targetVersion: 0))
         XCTAssertTrue(restructure.needsMigration(targetVersion: 1))
         
@@ -95,7 +95,7 @@ class RestructureTests: XCTestCase {
         XCTAssertTrue(restructure.needsMigration(targetVersion: 44))
     }
     
-    func testMigrationWorksInitially() {
+    func testMigrationWorksInitially() throws {
         XCTAssertEqual(restructure.userVersion, 0)
         
         XCTAssertNoThrow(try restructure.migrate(version: 1) {
@@ -105,7 +105,7 @@ class RestructureTests: XCTestCase {
         XCTAssertEqual(restructure.userVersion, 1)
     }
     
-    func testMigrationWorksSerially() {
+    func testMigrationWorksSerially() throws {
         XCTAssertEqual(restructure.userVersion, 0)
         
         XCTAssertNoThrow(try restructure.migrate(version: 1) {
@@ -119,7 +119,7 @@ class RestructureTests: XCTestCase {
         XCTAssertEqual(restructure.userVersion, 2)
     }
     
-    func testMigrationFailsOutOfSequence() {
+    func testMigrationFailsOutOfSequence() throws {
         XCTAssertEqual(restructure.userVersion, 0)
         
         XCTAssertThrowsError(try restructure.migrate(version: 2) {
@@ -129,34 +129,34 @@ class RestructureTests: XCTestCase {
         XCTAssertEqual(restructure.userVersion, 0)
     }
     
-    func testMigrationSkipsIfDone() {
+    func testMigrationSkipsIfDone() throws {
         XCTAssertEqual(restructure.userVersion, 0)
         
         XCTAssertNoThrow(try restructure.migrate(version: 1) {
             try $0.execute(query: "CREATE TABLE foo (A INT)")
         })
         
-        XCTAssertEqual(fooCount, 0)
+        XCTAssertEqual(try getFooCount(), 0)
         
         XCTAssertNoThrow(try restructure.migrate(version: 1) {
             try $0.execute(query: "INSERT INTO foo (a) VALUES (1)")
         })
         
-        XCTAssertEqual(fooCount, 0)
+        XCTAssertEqual(try getFooCount(), 0)
     }
     
     // MARK: - Custom Function Tests
     
-    func testUpperFunctionWithStandardString() {
+    func testUpperFunctionWithStandardString() throws {
         // Create a table that stores strings
-        try! restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
+        try restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
         
         // Insert some test data
-        try! restructure.execute(query: "INSERT INTO foo (value) VALUES ('Hello')")
+        try restructure.execute(query: "INSERT INTO foo (value) VALUES ('Hello')")
         let id = restructure.lastInsertedId
         
         // Fetch the data back out, with upper case values
-        let fetchStatement = try! restructure.prepare(query: "SELECT UPPER(value) AS value FROM foo WHERE id = :id")
+        let fetchStatement = try restructure.prepare(query: "SELECT UPPER(value) AS value FROM foo WHERE id = :id")
         fetchStatement.bind(value: id, for: "id")
         
         guard case .row(let row) = fetchStatement.step() else {
@@ -167,16 +167,16 @@ class RestructureTests: XCTestCase {
         XCTAssertEqual(row["value"], "HELLO")
     }
     
-    func testUpperFunctionWithComplexString() {
+    func testUpperFunctionWithComplexString() throws {
         // Create a table that stores strings
-        try! restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
+        try restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
         
         // Insert some test data
-        try! restructure.execute(query: "INSERT INTO foo (value) VALUES ('👋🏻 Hello 👋🏼')")
+        try restructure.execute(query: "INSERT INTO foo (value) VALUES ('👋🏻 Hello 👋🏼')")
         let id = restructure.lastInsertedId
         
         // Fetch the data back out, with upper case values
-        let fetchStatement = try! restructure.prepare(query: "SELECT UPPER(value) AS value FROM foo WHERE id = :id")
+        let fetchStatement = try restructure.prepare(query: "SELECT UPPER(value) AS value FROM foo WHERE id = :id")
         fetchStatement.bind(value: id, for: "id")
         
         guard case .row(let row) = fetchStatement.step() else {
@@ -187,16 +187,16 @@ class RestructureTests: XCTestCase {
         XCTAssertEqual(row["value"], "👋🏻 HELLO 👋🏼")
     }
     
-    func testUpperFunctionWithUnicodeString() {
+    func testUpperFunctionWithUnicodeString() throws {
         // Create a table that stores strings
-        try! restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
+        try restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
         
         // Insert some test data
-        try! restructure.execute(query: "INSERT INTO foo (value) VALUES ('exámple óóßChloë')")
+        try restructure.execute(query: "INSERT INTO foo (value) VALUES ('exámple óóßChloë')")
         let id = restructure.lastInsertedId
         
         // Fetch the data back out, with upper case values
-        let fetchStatement = try! restructure.prepare(query: "SELECT UPPER(value) AS value FROM foo WHERE id = :id")
+        let fetchStatement = try restructure.prepare(query: "SELECT UPPER(value) AS value FROM foo WHERE id = :id")
         fetchStatement.bind(value: id, for: "id")
         
         guard case .row(let row) = fetchStatement.step() else {
@@ -209,8 +209,8 @@ class RestructureTests: XCTestCase {
     
     // MARK: - Utilities
     
-    private var fooCount: Int {
-        let statement = try! restructure.prepare(query: "SELECT COUNT(a) FROM foo")
+    private func getFooCount() throws -> Int {
+        let statement = try restructure.prepare(query: "SELECT COUNT(a) FROM foo")
         let result = statement.step()
         
         switch result {

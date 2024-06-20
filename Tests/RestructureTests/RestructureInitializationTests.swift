@@ -14,11 +14,11 @@ class RestructureInitializationTests: XCTestCase {
     var restructure: Restructure? = nil
     var tempPath: String = ""
     
-    override func setUp() {
+    override func setUpWithError() throws {
         tempPath = testPath(description: "Initialization Tests")
     }
     
-    override func tearDown() {
+    override func tearDownWithError() throws {
         if let restructure = restructure {
             restructure.close()
             self.restructure = nil
@@ -27,23 +27,23 @@ class RestructureInitializationTests: XCTestCase {
         let manager = FileManager.default
         
         if manager.fileExists(atPath: tempPath) {
-            try! manager.removeItem(atPath: tempPath)
+            try manager.removeItem(atPath: tempPath)
         }
     }
     
-    func testCreateInMemoryWorks() {
+    func testCreateInMemoryWorks() throws {
         XCTAssertNoThrow(restructure = try Restructure())
         XCTAssertNotNil(restructure)
     }
     
-    func testCreateFileWorks() {
+    func testCreateFileWorks() throws {
         XCTAssertNoThrow(restructure = try Restructure(path: tempPath))
         XCTAssertNotNil(restructure)
     }
     
-    func testCreateExistingFileWorks() {
+    func testCreateExistingFileWorks() throws {
         // Build the first time
-        restructure = try! Restructure(path: tempPath)
+        restructure = try Restructure(path: tempPath)
         restructure!.close()
         restructure = nil
         
@@ -54,27 +54,27 @@ class RestructureInitializationTests: XCTestCase {
         XCTAssertNotNil(restructure)
     }
     
-    func testJournalModeDefault() {
-        restructure = try! Restructure(path: tempPath)
+    func testJournalModeDefault() throws {
+        restructure = try Restructure(path: tempPath)
         XCTAssertEqual(restructure!.journalMode, .wal)
         restructure!.close()
         
-        restructure = try! Restructure()
+        restructure = try Restructure()
         XCTAssertEqual(restructure!.journalMode, .memory)
         restructure!.close()
     }
     
-    func testJournalModeSettable() {
+    func testJournalModeSettable() throws {
         for mode in JournalMode.allCases {
-            restructure = try! Restructure(path: tempPath, journalMode: mode)
+            restructure = try Restructure(path: tempPath, journalMode: mode)
             XCTAssertEqual(restructure!.journalMode, mode)
             restructure!.close()
         }
     }
     
-    func testSecureDeleteSettable() {
+    func testSecureDeleteSettable() throws {
         for mode in SecureDelete.allCases {
-            restructure = try! Restructure(path: tempPath)
+            restructure = try Restructure(path: tempPath)
             restructure!.secureDelete = mode
             
             let newMode = restructure!.secureDelete
@@ -84,9 +84,9 @@ class RestructureInitializationTests: XCTestCase {
         }
     }
     
-    func testAutoVacuumSettable() {
+    func testAutoVacuumSettable() throws {
         for mode in AutoVacuum.allCases {
-            restructure = try! Restructure(path: tempPath)
+            restructure = try Restructure(path: tempPath)
             restructure!.autoVacuum = mode
             restructure!.vacuum()
             
@@ -97,8 +97,8 @@ class RestructureInitializationTests: XCTestCase {
         }
     }
     
-    func testIncrementalAutoVacuum() {
-        restructure = try! Restructure(path: tempPath)
+    func testIncrementalAutoVacuum() throws {
+        restructure = try Restructure(path: tempPath)
         restructure!.autoVacuum = .incremental
         restructure!.vacuum()
         

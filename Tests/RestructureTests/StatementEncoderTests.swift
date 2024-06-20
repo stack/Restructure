@@ -13,9 +13,9 @@ class StatementEncoderTests: XCTestCase {
 
     var restructure: Restructure!
     
-    override func setUp() {
-        restructure = try! Restructure()
-        try! restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b TEXT, c REAL, d INT, e BLOB)")
+    override func setUpWithError() throws {
+        restructure = try Restructure()
+        try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b TEXT, c REAL, d INT, e BLOB)")
     }
 
     override func tearDown() {
@@ -23,7 +23,7 @@ class StatementEncoderTests: XCTestCase {
         restructure = nil
     }
 
-    func testSimpleEncodable() {
+    func testSimpleEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let b: String
@@ -32,7 +32,7 @@ class StatementEncoderTests: XCTestCase {
             let e: Data
         }
         
-        let statement = try! restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:b, :c, :d, :e)")
+        let statement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:b, :c, :d, :e)")
         
         let foo = Foo(a: nil, b: "1", c: 2.0, d: 3, e: Data(bytes: [0x4, 0x5, 0x6], count: 3))
         
@@ -47,7 +47,7 @@ class StatementEncoderTests: XCTestCase {
             return
         }
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a, b, c, d, e FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo LIMIT 1")
         
         result = selectStatement.step()
         
@@ -62,13 +62,13 @@ class StatementEncoderTests: XCTestCase {
         XCTAssertEqual(row["e"], Data(bytes: [0x4, 0x5, 0x6], count: 3))
     }
     
-    func testEmojiStringEncodable() {
+    func testEmojiStringEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let b: String
         }
         
-        let statement = try! restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
+        let statement = try restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
         
         let foo = Foo(a: nil, b: "👋🏻 HELLO 👋🏼")
         
@@ -83,7 +83,7 @@ class StatementEncoderTests: XCTestCase {
             return
         }
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
         
         result = selectStatement.step()
         
@@ -95,13 +95,13 @@ class StatementEncoderTests: XCTestCase {
         XCTAssertEqual(row["b"], "👋🏻 HELLO 👋🏼")
     }
     
-    func testUnicodeStringEncodable() {
+    func testUnicodeStringEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let b: String
         }
         
-        let statement = try! restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
+        let statement = try restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
         
         let foo = Foo(a: nil, b: "exámple óóßChloë")
         
@@ -116,7 +116,7 @@ class StatementEncoderTests: XCTestCase {
             return
         }
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
         
         result = selectStatement.step()
         
@@ -128,13 +128,13 @@ class StatementEncoderTests: XCTestCase {
         XCTAssertEqual(row["b"], "exámple óóßChloë")
     }
     
-    func testArrayEncodable() {
+    func testArrayEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let e: [Int]
         }
         
-        let statement = try! restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
+        let statement = try restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
         
         let foo = Foo(a: nil, e: [1, 2, 3])
         
@@ -149,7 +149,7 @@ class StatementEncoderTests: XCTestCase {
             return
         }
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
         
         result = selectStatement.step()
         
@@ -161,13 +161,13 @@ class StatementEncoderTests: XCTestCase {
         XCTAssertEqual(row["e"], [1, 2, 3])
     }
     
-    func testMultiArrayEncodable() {
+    func testMultiArrayEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let e: [[Int]]
         }
         
-        let statement = try! restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
+        let statement = try restructure.prepare(query: "INSERT INTO foo (e) VALUES (:e)")
         
         let foo = Foo(a: nil, e: [[1, 2, 3]])
         
@@ -182,7 +182,7 @@ class StatementEncoderTests: XCTestCase {
             return
         }
         
-        let selectStatement = try! restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
         
         result = selectStatement.step()
         
@@ -194,7 +194,7 @@ class StatementEncoderTests: XCTestCase {
         XCTAssertEqual(row["e"], [[1, 2, 3]])
     }
     
-    func testEncodingEnumRawValues() {
+    func testEncodingEnumRawValues() throws {
         enum FooType: Int, Encodable {
             case one = 0
             case two = 1
@@ -205,9 +205,9 @@ class StatementEncoderTests: XCTestCase {
             let type: FooType
         }
         
-        try! restructure.execute(query: "CREATE TABLE foobar (id INTEGER PRIMARY KEY AUTOINCREMENT, type INTEGER)")
+        try restructure.execute(query: "CREATE TABLE foobar (id INTEGER PRIMARY KEY AUTOINCREMENT, type INTEGER)")
         
-        let statement = try! restructure.prepare(query: "INSERT INTO foobar (type) VALUES (:type)")
+        let statement = try restructure.prepare(query: "INSERT INTO foobar (type) VALUES (:type)")
         
         let foo = Foo(id: nil, type: .two)
         
@@ -222,7 +222,7 @@ class StatementEncoderTests: XCTestCase {
             return
         }
         
-        let selectStatement = try! restructure.prepare(query: "SELECT id, type FROM foobar LIMIT 1")
+        let selectStatement = try restructure.prepare(query: "SELECT id, type FROM foobar LIMIT 1")
         
         result = selectStatement.step()
         
