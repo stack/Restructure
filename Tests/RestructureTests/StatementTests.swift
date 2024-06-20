@@ -29,10 +29,13 @@ class StatementTests: XCTestCase {
         var restructure: Restructure? = try Restructure()
         try restructure!.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT)")
         
-        let statement: Statement? = try restructure!.prepare(query: "SELECT a FROM foo")
+        var statement: Statement?  = try restructure!.prepare(query: "SELECT a FROM foo")
+        XCTAssertEqual(statement?.columnNames, ["a"]) // Simple test to hide the warning from the statement creation
         
         restructure?.close()
         restructure = nil
+        
+        statement = nil
         
         XCTSuccess("Completely freed stored statements")
     }
