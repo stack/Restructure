@@ -1,7 +1,7 @@
 #  Restructure
 
 [![Build Status](https://travis-ci.org/stack/Restructure.svg)](https://travis-ci.org/stack/Restructure)
-![Swift 5.1](https://img.shields.io/badge/Swift-5.1-orange.svg)
+![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg)
 
 Restructure is a wrapper library for [SQLite](https://sqlite.org/index.html) for
 iOS, macOS, and tvOS. It's fairly opinionated, as in, it does exactly what I
