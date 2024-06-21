@@ -1,6 +1,6 @@
 #  Restructure
 
-[![Build Status](https://travis-ci.org/stack/Restructure.svg)](https://travis-ci.org/stack/Restructure)
+[![Build Status](https://github.com/stack/Restructure/actions/workflows/swift.yml/badge.svg)](https://github.com/stack/Restructure/actions/workflows/swift.yml)
 ![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg)
 
 Restructure is a wrapper library for [SQLite](https://sqlite.org/index.html) for
