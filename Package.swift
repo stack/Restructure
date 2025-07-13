@@ -22,7 +22,7 @@ let package = Package(
         .target(
             name: "Restructure",
             swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency")
             ],
             plugins: [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")],
         ),
@@ -33,7 +33,7 @@ let package = Package(
                 .product(name: "Numerics", package: "swift-numerics")
             ],
             swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency")
             ]
         ),
     ]
