@@ -17,11 +17,11 @@ public class Row {
 
     private let statement: Statement
 
-    internal var arrayStrategy: ArrayStrategy {
+    var arrayStrategy: ArrayStrategy {
         statement.arrayStrategy
     }
 
-    internal var dateStrategy: DateStrategy {
+    var dateStrategy: DateStrategy {
         statement.dateStrategy
     }
 
@@ -30,7 +30,7 @@ public class Row {
         Array(statement.columns.keys)
     }
 
-    internal required init(statement: Statement) {
+    required init(statement: Statement) {
         self.statement = statement
     }
 

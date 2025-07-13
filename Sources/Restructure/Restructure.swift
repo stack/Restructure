@@ -10,14 +10,14 @@ import Foundation
 import SQLite3
 
 /// Type aliases for common SQLite pointers
-internal typealias SQLiteDatabase = OpaquePointer
-internal typealias SQLiteStatement = OpaquePointer
+typealias SQLiteDatabase = OpaquePointer
+typealias SQLiteStatement = OpaquePointer
 
 // swiftlint:disable identifier_name
 
 /// Proper import for the SQLite string memory functions
-internal let SQLITE_STATIC = unsafeBitCast(0, to: sqlite3_destructor_type.self)
-internal let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+let SQLITE_STATIC = unsafeBitCast(0, to: sqlite3_destructor_type.self)
+let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
 // swiftlint:enable identifier_name
 
@@ -54,7 +54,7 @@ public class Restructure {
         set { set(pragma: "secure_delete", value: newValue) }
     }
 
-    internal let db: SQLiteDatabase
+    let db: SQLiteDatabase
     private var isOpen: Bool
 
     private let path: String?
@@ -244,7 +244,7 @@ public class Restructure {
         return statement
     }
 
-    internal func finalize(statement: Statement) {
+    func finalize(statement: Statement) {
         guard preparedStatements.contains(statement.statement) else { return }
 
         preparedStatements.remove(statement.statement)

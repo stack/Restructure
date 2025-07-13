@@ -17,7 +17,7 @@ public enum RestructureError: Error {
     /// An error related to SQLite
     case internalError(Int32, String)
 
-    internal static func from(result: Int32) -> Self {
+    static func from(result: Int32) -> Self {
         if let message = String.from(sqliteResult: result) {
             return internalError(result, message)
         } else {

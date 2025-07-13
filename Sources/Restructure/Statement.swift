@@ -16,13 +16,13 @@ public class Statement {
 
     // MARK: - Properties
 
-    internal let restructure: Restructure
-    internal let statement: SQLiteStatement
+    let restructure: Restructure
+    let statement: SQLiteStatement
 
-    internal var bindables: [String:Int32] = [:]
-    internal var columns: [String:Int32] = [:]
+    var bindables: [String:Int32] = [:]
+    var columns: [String:Int32] = [:]
 
-    internal var isFinalized: Bool = false
+    var isFinalized: Bool = false
 
     /// The mechanism for converting an array of data in to a storable type and vice versa.
     public var arrayStrategy: ArrayStrategy = .bplist
@@ -42,7 +42,7 @@ public class Statement {
 
     // MARK: - Initialization
 
-    internal required init(restructure: Restructure, query: String) throws {
+    required init(restructure: Restructure, query: String) throws {
         self.restructure = restructure
 
         // Build the underlying statement
@@ -132,7 +132,7 @@ public class Statement {
         finalize()
     }
 
-    internal func finalize() {
+    func finalize() {
         guard !isFinalized else {
             return
         }
