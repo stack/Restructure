@@ -3,14 +3,14 @@
 [![Build Status](https://github.com/stack/Restructure/actions/workflows/swift.yml/badge.svg)](https://github.com/stack/Restructure/actions/workflows/swift.yml)
 ![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg)
 
-Restructure is a wrapper library for [SQLite](https://sqlite.org/index.html) for
-iOS, macOS, and tvOS. It's fairly opinionated, as in, it does exactly what I
-want it to do. Feel free to use it, fork it, or do what you would like with it.
+Restructure is a wrapper library for [SQLite](https://sqlite.org/index.html) for iOS, macOS, and tvOS. It's fairly
+opinionated, as in, it does exactly what I want it to do. Feel free to use it, fork it, or do what you would like with 
+it.
 
 ## Installation
 
-Starting at version 2.0.0, Restructure is a [Swift Package Manager](https://swift.org/package-manager/)
-project. Use the appropriate tools to include Restructure in to your project.
+Starting at version 2.0.0, Restructure is a [Swift Package Manager](https://swift.org/package-manager/) project. Use the
+appropriate tools to include Restructure in to your project.
 
 ## Usage
 
@@ -66,11 +66,10 @@ if case let row(row) = selectStatement.step() {
 
 Note: Statements finalize themselves.
 
-Data conversions are handled by the framework. When binding data, it is bound
-using the closest datatype available to SQLite. When extracting values from a
-row, the data is converted to the explicit type of the variable. Variable types
-must be defined to extract the data. SQLite is then used to perform any [data
-type conversion](https://www.sqlite.org/datatype3.html).
+Data conversions are handled by the framework. When binding data, it is bound using the closest datatype available to
+SQLite. When extracting values from a row, the data is converted to the explicit type of the variable. Variable types 
+must be defined to extract the data. SQLite is then used to perform any 
+[data type conversion](https://www.sqlite.org/datatype3.html).
 
 Restructure currently supports the following data types:
 
@@ -93,9 +92,8 @@ Restructure currently supports the following data types:
 
 ### Statements Are Sequences
 
-To help with fetching data, all statements are `Sequence` types and can be
-iterated over. The iterator returns a row for every successful `step` that would
-have been performed.
+To help with fetching data, all statements are `Sequence` types and can be iterated over. The iterator returns a row for
+every successful `step` that would have been performed.
 
 ```swift
 let statement = try restructure.prepare(query: "SELECT name, age FROM foo")
@@ -108,9 +106,8 @@ for row in statement {
 
 ### Complex Data Types
 
-Restructure supports storing arrays of data. This is done by encoding the data
-and storing it like a normal value. Encoding can either be done with binary
-plists or JSON.
+Restructure supports storing arrays of data. This is done by encoding the data and storing it like a normal value.
+Encoding can either be done with binary plists or JSON.
 
 ```swift
 // Make all arrays in Restructure binary plists
@@ -201,8 +198,8 @@ let c: Double = row.c
 
 ### Migrations
 
-The Restructure object has a `userVersion` property to track the version of a
-database. This can be used for any purpose, but is best used for migrations.
+The Restructure object has a `userVersion` property to track the version of a database. This can be used for any
+purpose, but is best used for migrations.
 
 ```swift
 // Run an initial migration
@@ -216,16 +213,13 @@ try restructure.migrate(version: 2) {
 }
 ```
 
-After each run of `migrate`, the `userVersion` value is incremented. Subsequent
-runs of migrations are ignored for versions that have already been run.
+After each run of `migrate`, the `userVersion` value is incremented. Subsequent runs of migrations are ignored for
+versions that have already been run.
 
 ## Caveats
 
-Restructure makes no guarantees about thread safety. It is as safe as the
-underlying SQLite library.
+Restructure makes no guarantees about thread safety. It is as safe as the underlying SQLite library.
 
-The `Codable` support only supports single objects. Hierarchies of data are not
-supported.
+The `Codable` support only supports single objects. Hierarchies of data are not supported.
 
-`UInt64` is not supported as a data type, as SQLite only supports signed 64-bit
-integers.
+`UInt64` is not supported as a data type, as SQLite only supports signed 64-bit integers.
