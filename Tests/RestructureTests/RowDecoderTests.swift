@@ -6,24 +6,21 @@
 //  SPDX-License-Identifier: MIT
 //
 
-import XCTest
+import Foundation
+import Testing
+
 @testable import Restructure
 
-class RowDecoderTests: XCTestCase {
+struct RowDecoderTests {
 
-    var restructure: Restructure!
+    let restructure: Restructure
 
-    override func setUpWithError() throws {
+    init() throws {
         restructure = try Restructure()
         try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b TEXT, c REAL, d INT, e BLOB)")
     }
 
-    override func tearDown() {
-        restructure.close()
-        restructure = nil
-    }
-
-    func testSimpleDecodable() throws {
+    @Test func simpleDecodable() throws {
         struct Foo: Decodable {
             let a: Int64?
             let b: String
@@ -41,24 +38,23 @@ class RowDecoderTests: XCTestCase {
         try insertStatement.perform()
 
         let selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo LIMIT 1")
-
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let decoder = RowDecoder()
         let foo = try decoder.decode(Foo.self, from: row)
 
-        XCTAssertEqual(foo.b, "1")
-        XCTAssertEqual(foo.c, 2.0)
-        XCTAssertEqual(foo.d, 3)
-        XCTAssertEqual(foo.e, Data(bytes: [0x4, 0x5, 0x6], count: 3))
+        #expect(foo.b == "1")
+        #expect(foo.c == 2.0)
+        #expect(foo.d == 3)
+        #expect(foo.e == Data(bytes: [0x4, 0x5, 0x6], count: 3))
     }
 
-    func testEmojiStringDecodable() throws {
+    @Test func emojiStringDecodable() throws {
         struct Foo: Decodable {
             let a: Int64?
             let b: String
@@ -70,21 +66,20 @@ class RowDecoderTests: XCTestCase {
         try insertStatement.perform()
 
         let selectStatement = try restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
-
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let decoder = RowDecoder()
         let foo = try decoder.decode(Foo.self, from: row)
 
-        XCTAssertEqual(foo.b, "👋🏻 HELLO 👋🏼")
+        #expect(foo.b == "👋🏻 HELLO 👋🏼")
     }
 
-    func testUnicodeStringDecodable() throws {
+    @Test func unicodeStringDecodable() throws {
         struct Foo: Decodable {
             let a: Int64?
             let b: String
@@ -96,21 +91,20 @@ class RowDecoderTests: XCTestCase {
         try insertStatement.perform()
 
         let selectStatement = try restructure.prepare(query: "SELECT a, b FROM foo LIMIT 1")
-
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let decoder = RowDecoder()
         let foo = try decoder.decode(Foo.self, from: row)
 
-        XCTAssertEqual(foo.b, "exámple óóßChloë")
+        #expect(foo.b == "exámple óóßChloë")
     }
 
-    func testArrayDecodable() throws {
+    @Test func arrayDecodable() throws {
         struct Foo: Decodable {
             let a: Int64?
             let e: [Int]
@@ -122,21 +116,20 @@ class RowDecoderTests: XCTestCase {
         try insertStatement.perform()
 
         let selectStatement = try restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
-
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let decoder = RowDecoder()
         let foo = try decoder.decode(Foo.self, from: row)
 
-        XCTAssertEqual(foo.e, [1, 2, 3])
+        #expect(foo.e == [1, 2, 3])
     }
 
-    func testMultiDimensionArrayDecodable() throws {
+    @Test func multiDimensionArrayDecodable() throws {
         struct Foo: Decodable {
             let a: Int64?
             let e: [[Int]]
@@ -148,21 +141,20 @@ class RowDecoderTests: XCTestCase {
         try insertStatement.perform()
 
         let selectStatement = try restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
-
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let decoder = RowDecoder()
         let foo = try decoder.decode(Foo.self, from: row)
 
-        XCTAssertEqual(foo.e, [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        #expect(foo.e == [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     }
 
-    func testDecodingEnumRawValues() throws {
+    @Test func decodingEnumRawValues() throws {
         enum FooType: Int, Decodable {
             case one = 0
             case two = 1
@@ -181,18 +173,17 @@ class RowDecoderTests: XCTestCase {
         try insertStatement.perform()
 
         let selectStatement = try restructure.prepare(query: "SELECT id, type FROM foobar LIMIT 1")
-
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let decoder = RowDecoder()
         let foo = try decoder.decode(Foo.self, from: row)
 
-        XCTAssertEqual(foo.type, .two)
+        #expect(foo.type == .two)
     }
 
 }

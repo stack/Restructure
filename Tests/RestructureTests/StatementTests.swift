@@ -6,80 +6,73 @@
 //  SPDX-License-Identifier: MIT
 //
 
-import XCTest
+import Foundation
+import Testing
+
 @testable import Restructure
 
-class StatementTests: XCTestCase {
+struct StatementTests {
 
-    var restructure: Restructure!
+    var restructure: Restructure
 
-    override func setUpWithError() throws {
+    init() throws {
         restructure = try Restructure()
         try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b TEXT, c REAL, d INT, e BLOB)")
     }
 
-    override func tearDown() {
-        restructure.close()
-        restructure = nil
-    }
-
     // MARK: - Finalzie Tests
 
-    func testFinalizeStoredStatement() throws {
+    @Test func finalizeStoredStatement() throws {
         var restructure: Restructure? = try Restructure()
         try restructure!.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT)")
 
         var statement: Statement?  = try restructure!.prepare(query: "SELECT a FROM foo")
-        XCTAssertEqual(statement?.columnNames, ["a"]) // Simple test to hide the warning from the statement creation
+        #expect(statement?.columnNames == ["a"]) // Simple test to hide the warning from the statement creation
 
         restructure?.close()
         restructure = nil
 
         statement = nil
-
-        XCTSuccess("Completely freed stored statements")
     }
 
     // MARK: - Prepare Tests
 
-    func testPrepareInvalidStatement() throws {
-        XCTAssertThrowsError(try restructure.prepare(query: "SELECT FOO BAR BAZ"))
+    @Test func prepareInvalidStatement() throws {
+        #expect(throws: RestructureError.self) {
+            try restructure.prepare(query: "SELECT FOO BAR BAZ")
+        }
     }
 
-    func testPrepareValidStatementWithBindables() throws {
-        var statement: Statement!
-        XCTAssertNoThrow(statement = try restructure.prepare(query: "SELECT a, b, c FROM foo WHERE b IS :ONE OR b IS $TWO OR c IS @THREE"))
+    @Test func prepareValidStatementWithBindables() throws {
+        let statement: Statement = try restructure.prepare(query: "SELECT a, b, c FROM foo WHERE b IS :ONE OR b IS $TWO OR c IS @THREE")
 
-        XCTAssertEqual(3, statement.bindables.count)
-        XCTAssertEqual(1, statement.bindables["ONE"])
-        XCTAssertEqual(2, statement.bindables["TWO"])
-        XCTAssertEqual(3, statement.bindables["THREE"])
+        #expect(statement.bindables.count == 3)
+        #expect(statement.bindables["ONE"] == 1)
+        #expect(statement.bindables["TWO"] == 2)
+        #expect(statement.bindables["THREE"] == 3)
 
-        XCTAssertEqual(3, statement.columns.count)
-        XCTAssertEqual(0, statement.columns["a"])
-        XCTAssertEqual(1, statement.columns["b"])
-        XCTAssertEqual(2, statement.columns["c"])
+        #expect(statement.columns.count == 3)
+        #expect(statement.columns["a"] == 0)
+        #expect(statement.columns["b"] == 1)
+        #expect(statement.columns["c"] == 2)
     }
 
-    func testPrepareValidStatementWithoutBindables() throws {
-        var statement: Statement!
-        XCTAssertNoThrow(statement = try restructure.prepare(query: "SELECT a, b, c FROM foo WHERE b IS ? OR b IS ? OR c IS ?"))
+    @Test func prepareValidStatementWithoutBindables() throws {
+        let statement: Statement = try restructure.prepare(query: "SELECT a, b, c FROM foo WHERE b IS ? OR b IS ? OR c IS ?")
 
-        XCTAssertEqual(0, statement.bindables.count)
+        #expect(statement.bindables.count == 0)
 
-        XCTAssertEqual(3, statement.columns.count)
-        XCTAssertEqual(0, statement.columns["a"])
-        XCTAssertEqual(1, statement.columns["b"])
-        XCTAssertEqual(2, statement.columns["c"])
+        #expect(statement.columns.count == 3)
+        #expect(statement.columns["a"] == 0)
+        #expect(statement.columns["b"] == 1)
+        #expect(statement.columns["c"] == 2)
     }
 
     // MARK: - Read / Write Tests
 
-    func testDeleteStatement() throws {
-        var insertStatement: Statement!
-
+    @Test func deleteStatement() throws {
         // Insert a row
-        XCTAssertNoThrow(insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)"))
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)")
 
         insertStatement.bind(value: "foo", for: "B")
         insertStatement.bind(value: 42.1, for: "C")
@@ -88,31 +81,28 @@ class StatementTests: XCTestCase {
         let data = Data(bytes: [0x41, 0x42, 0x43], count: 3)
         insertStatement.bind(value: data, for: "E")
 
-        XCTAssertNoThrow(try insertStatement.perform())
+        try insertStatement.perform()
 
         // Ensure we have 1 row
         let initialCount = try getFooCount()
-        XCTAssertEqual(1, initialCount)
+        #expect(initialCount == 1)
 
         // Delete all rows
-        var deleteStatement: Statement!
-        XCTAssertNoThrow(deleteStatement = try restructure.prepare(query: "DELETE FROM foo"))
-
-        XCTAssertNoThrow(try deleteStatement.perform())
+        let deleteStatement = try restructure.prepare(query: "DELETE FROM foo")
+        try deleteStatement.perform()
 
         // Ensure we have 0 rows
         let deletedCount = try getFooCount()
-        XCTAssertEqual(0, deletedCount)
+        #expect(deletedCount == 0)
     }
 
-    func testInsertStatement() throws {
+    @Test func insertStatement() throws {
         // Ensure we have no rows
         let initialCount = try getFooCount()
-        XCTAssertEqual(0, initialCount)
+        #expect(initialCount == 0)
 
         // Insert a row
-        var insertStatement: Statement!
-        XCTAssertNoThrow(insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)"))
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)")
 
         insertStatement.bind(value: "foo", for: "B")
         insertStatement.bind(value: 42.1, for: "C")
@@ -121,22 +111,21 @@ class StatementTests: XCTestCase {
         let data = Data(bytes: [0x41, 0x42, 0x43 ], count: 3)
         insertStatement.bind(value: data, for: "E")
 
-        XCTAssertNoThrow(try insertStatement.perform())
+        try insertStatement.perform()
 
         // Ensure we have 1 row
         let updatedCount = try getFooCount()
-        XCTAssertEqual(1, updatedCount)
+        #expect(updatedCount == 1)
 
         // Get the data that was inserted
         let lastId = restructure.lastInsertedId
 
-        var selectStatement: Statement!
-        XCTAssertNoThrow(selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo"))
+        let selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo")
 
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to get row result")
+            Issue.record("Failed to get row result")
             return
         }
 
@@ -146,11 +135,11 @@ class StatementTests: XCTestCase {
         let dString: Int = row["d"]
         let eString: Data? = row["e"]
 
-        XCTAssertEqual(lastId, aString)
-        XCTAssertEqual("foo", bString)
-        XCTAssertEqual(42.1, cString)
-        XCTAssertEqual(42, dString)
-        XCTAssertEqual(data, eString)
+        #expect(aString == lastId)
+        #expect(bString == "foo")
+        #expect(cString == 42.1)
+        #expect(dString == 42)
+        #expect(eString == data)
 
         let aInt: Int64 = row[0]
         let bInt: String? = row[1]
@@ -158,21 +147,20 @@ class StatementTests: XCTestCase {
         let dInt: Int = row[3]
         let eInt: Data? = row[4]
 
-        XCTAssertEqual(lastId, aInt)
-        XCTAssertEqual("foo", bInt)
-        XCTAssertEqual(42.1, cInt)
-        XCTAssertEqual(42, dInt)
-        XCTAssertEqual(data, eInt)
+        #expect(aInt == lastId)
+        #expect(bInt == "foo")
+        #expect(cInt == 42.1)
+        #expect(dInt == 42)
+        #expect(eInt == data)
     }
 
-    func testInsertNull() throws {
+    @Test func insertNull() throws {
         // Ensure we have no rows
         let initialCount = try getFooCount()
-        XCTAssertEqual(0, initialCount)
+        #expect(initialCount == 0)
 
         // Insert a row
-        var insertStatement: Statement!
-        XCTAssertNoThrow(insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)"))
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)")
 
         let nullString: String? = nil
         let nullDouble: Double? = nil
@@ -184,22 +172,21 @@ class StatementTests: XCTestCase {
         insertStatement.bind(value: nullInt, for: "D")
         insertStatement.bind(value: nullData, for: "E")
 
-        XCTAssertNoThrow(try insertStatement.perform())
+        try insertStatement.perform()
 
         // Ensure we have 1 row
         let updatedCount = try getFooCount()
-        XCTAssertEqual(1, updatedCount)
+        #expect(updatedCount == 1)
 
         // Get the data that was inserted
         let lastId = restructure.lastInsertedId
 
-        var selectStatement: Statement!
-        XCTAssertNoThrow(selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo"))
+        let selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo")
 
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to get row result")
+            Issue.record("Failed to get row result")
             return
         }
 
@@ -209,17 +196,16 @@ class StatementTests: XCTestCase {
         let dValue: Int? = row["d"]
         let eValue: Data? = row["e"]
 
-        XCTAssertEqual(lastId, aValue)
-        XCTAssertNil(bValue)
-        XCTAssertNil(cValue)
-        XCTAssertNil(dValue)
-        XCTAssertNil(eValue)
+        #expect(aValue == lastId)
+        #expect(nil == bValue)
+        #expect(nil == cValue)
+        #expect(nil == dValue)
+        #expect(nil == eValue)
     }
 
-    func testUpdateStatement() throws {
+    @Test func updateStatement() throws {
         // Insert a row
-        var insertStatement: Statement!
-        XCTAssertNoThrow(insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)"))
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)")
 
         insertStatement.bind(value: "foo", for: "B")
         insertStatement.bind(value: 42.1, for: "C")
@@ -228,18 +214,17 @@ class StatementTests: XCTestCase {
         let data = Data(bytes: [0x41, 0x42, 0x43], count: 3)
         insertStatement.bind(value: data, for: "E")
 
-        XCTAssertNoThrow(try insertStatement.perform())
+        try insertStatement.perform()
 
         // Ensure we have 1 row
         let initialCount = try getFooCount()
-        XCTAssertEqual(1, initialCount)
+        #expect(initialCount == 1)
 
         // Get the data that was inserted
         let lastId = restructure.lastInsertedId
 
         // Update the row
-        var updateStatement: Statement!
-        XCTAssertNoThrow(updateStatement = try restructure.prepare(query: "UPDATE foo SET b = :B, c = :C, d = :D, e = :E where a = :A"))
+        let updateStatement = try restructure.prepare(query: "UPDATE foo SET b = :B, c = :C, d = :D, e = :E where a = :A")
 
         updateStatement.bind(value: "bar", for: "B")
         updateStatement.bind(value: 1.1, for: "C")
@@ -249,22 +234,21 @@ class StatementTests: XCTestCase {
         let data2 = Data(bytes: [0x44, 0x45, 0x46], count: 3)
         updateStatement.bind(value: data2, for: "E")
 
-        XCTAssertNoThrow(try updateStatement.perform())
+        try updateStatement.perform()
 
         // Ensure there is still one row
         let updatedCount = try getFooCount()
-        XCTAssertEqual(1, updatedCount)
+        #expect(updatedCount == 1)
 
         // Ensure the updated values are set
-        var selectStatement: Statement!
-        XCTAssertNoThrow(selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo WHERE a = :A"))
+        let selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo WHERE a = :A")
 
         selectStatement.bind(value: lastId, for: "A")
 
         let result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to get row result")
+            Issue.record("Failed to get row result")
             return
         }
 
@@ -274,11 +258,11 @@ class StatementTests: XCTestCase {
         let dString: Int = row["d"]
         let eString: Data? = row["e"]
 
-        XCTAssertEqual(lastId, aString)
-        XCTAssertEqual("bar", bString)
-        XCTAssertEqual(1.1, cString)
-        XCTAssertEqual(2, dString)
-        XCTAssertEqual(data2, eString)
+        #expect(aString == lastId)
+        #expect(bString == "bar")
+        #expect(cString == 1.1)
+        #expect(dString == 2)
+        #expect(eString == data2)
 
         let aInt: Int64 = row[0]
         let bInt: String? = row[1]
@@ -286,14 +270,14 @@ class StatementTests: XCTestCase {
         let dInt: Int = row[3]
         let eInt: Data? = row[4]
 
-        XCTAssertEqual(lastId, aInt)
-        XCTAssertEqual("bar", bInt)
-        XCTAssertEqual(1.1, cInt)
-        XCTAssertEqual(2, dInt)
-        XCTAssertEqual(data2, eInt)
+        #expect(aInt == lastId)
+        #expect(bInt == "bar")
+        #expect(cInt == 1.1)
+        #expect(dInt == 2)
+        #expect(eInt == data2)
     }
 
-    func testReturnsMultipleRows() throws {
+    @Test func returnsMultipleRows() throws {
         // Build the insertion statement
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b, c, d, e) VALUES (:B, :C, :D, :E)")
 
@@ -305,7 +289,7 @@ class StatementTests: XCTestCase {
         let data1 = Data(bytes: [0x01], count: 1)
         insertStatement.bind(value: data1, for: "E")
 
-        XCTAssertNoThrow(try insertStatement.perform())
+        try insertStatement.perform()
 
         // Insert 2
         insertStatement.reset()
@@ -317,7 +301,7 @@ class StatementTests: XCTestCase {
         let data2 = Data(bytes: [0x02], count: 1)
         insertStatement.bind(value: data2, for: "E")
 
-        XCTAssertNoThrow(try insertStatement.perform())
+        try insertStatement.perform()
         insertStatement.reset()
 
         // Insert 3
@@ -330,64 +314,61 @@ class StatementTests: XCTestCase {
         let data3 = Data(bytes: [0x03], count: 1)
         insertStatement.bind(value: data3, for: "E")
 
-        XCTAssertNoThrow(try insertStatement.perform())
+        try insertStatement.perform()
 
         // Read rows
         let selectStatement = try restructure.prepare(query: "SELECT a, b, c, d, e FROM foo ORDER BY c ASC")
 
         // Read 1
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to read row")
+            Issue.record("Failed to read row")
             return
         }
 
         let b1: String? = row1[1]
         let c1: Double = row1[2]
         let d1: Int = row1[3]
-        let e1: Data? = row1[4]
+        let e1: Data = try #require(row1[4])
 
-        XCTAssertEqual("one", b1)
-        XCTAssertEqual(1.1, c1)
-        XCTAssertEqual(1, d1)
-        XCTAssertNotNil(e1)
-        XCTAssertEqual(1, e1!.count)
-        XCTAssertEqual(0x01, e1![0])
+        #expect(b1 == "one")
+        #expect(c1 == 1.1)
+        #expect(d1 == 1)
+        #expect(e1.count == 1)
+        #expect(e1[0] == 0x01)
 
         // Read 2
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to read row")
+            Issue.record("Failed to read row")
             return
         }
 
         let b2: String? = row2[1]
         let c2: Double = row2[2]
         let d2: Int = row2[3]
-        let e2: Data? = row2[4]
+        let e2: Data = try #require(row2[4])
 
-        XCTAssertEqual("two", b2)
-        XCTAssertEqual(2.2, c2)
-        XCTAssertEqual(2, d2)
-        XCTAssertNotNil(e2)
-        XCTAssertEqual(1, e2!.count)
-        XCTAssertEqual(0x02, e2![0])
+        #expect(b2 == "two")
+        #expect(c2 == 2.2)
+        #expect(d2 == 2)
+        #expect(e2.count == 1)
+        #expect(e2[0] == 0x02)
 
         // Read 3
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to read row")
+            Issue.record("Failed to read row")
             return
         }
 
         let b3: String? = row3[1]
         let c3: Double = row3[2]
         let d3: Int = row3[3]
-        let e3: Data? = row3[4]
+        let e3: Data = try #require(row3[4])
 
-        XCTAssertEqual("three", b3)
-        XCTAssertEqual(3.3, c3)
-        XCTAssertEqual(3, d3)
-        XCTAssertNotNil(e3)
-        XCTAssertEqual(1, e3!.count)
-        XCTAssertEqual(0x03, e3![0])
+        #expect(b3 == "three")
+        #expect(c3 == 3.3)
+        #expect(d3 == 3)
+        #expect(e3.count == 1)
+        #expect(e3[0] == 0x03)
     }
 
     // MARK: - Utilities

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented SwiftLint for the main source code.
 - Supported version numbers have been updated to modern versions.
 - Package specification has been updated to 6.1.
+- Switched to Swift Testing.
 
 ## 2.1.3 2024-06-20
 

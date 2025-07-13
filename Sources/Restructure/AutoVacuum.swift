@@ -9,7 +9,7 @@
 import Foundation
 
 /// The automatic vacuuming setting to use for the database
-public enum AutoVacuum: CaseIterable, PragmaRepresentable {
+public enum AutoVacuum: CaseIterable, PragmaRepresentable, Sendable {
 
     /// Auto vacuuming occurs after every transaction.
     case full

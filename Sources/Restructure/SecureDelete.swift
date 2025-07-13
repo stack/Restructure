@@ -9,7 +9,7 @@
 import Foundation
 
 /// The delete mode used when removing data.
-public enum SecureDelete: CaseIterable, PragmaRepresentable {
+public enum SecureDelete: CaseIterable, PragmaRepresentable, Sendable {
     /// Deleted data is zeroed only when it exists on the filesystem
     case fast
     /// Deleted data is not zeroed

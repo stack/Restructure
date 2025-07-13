@@ -6,107 +6,117 @@
 //  SPDX-License-Identifier: MIT
 //
 
-import XCTest
+import Foundation
+import Testing
+
 @testable import Restructure
 
-class RestructureInitializationTests: XCTestCase {
+final class RestructureInitializationTests {
 
     var restructure: Restructure? = nil
     var tempPath: String = ""
 
-    override func setUpWithError() throws {
+    init() {
         tempPath = testPath(description: "Initialization Tests")
     }
 
-    override func tearDownWithError() throws {
-        if let restructure = restructure {
-            restructure.close()
-            self.restructure = nil
-        }
-
-        let manager = FileManager.default
-
-        if manager.fileExists(atPath: tempPath) {
-            try manager.removeItem(atPath: tempPath)
-        }
+    deinit {
+        restructure?.close()
+        try? FileManager.default.removeItem(atPath: tempPath)
     }
 
-    func testCreateInMemoryWorks() throws {
-        XCTAssertNoThrow(restructure = try Restructure())
-        XCTAssertNotNil(restructure)
+    @Test func createInMemoryWorks() throws {
+        restructure = try Restructure()
     }
 
-    func testCreateFileWorks() throws {
-        XCTAssertNoThrow(restructure = try Restructure(path: tempPath))
-        XCTAssertNotNil(restructure)
+    @Test func createFileWorks() throws {
+        restructure = try Restructure(path: tempPath)
     }
 
-    func testCreateExistingFileWorks() throws {
+    @Test func createExistingFileWorks() throws {
         // Build the first time
         restructure = try Restructure(path: tempPath)
-        restructure!.close()
+        restructure?.close()
         restructure = nil
 
         // Attempt to run again
-        XCTAssertNoThrow(restructure = try Restructure(path: tempPath))
-        XCTAssertNotNil(restructure)
+        restructure = try Restructure(path: tempPath)
+    }
+}
 
-        XCTAssertNotNil(restructure)
+final class RestructurePropertiesTests {
+
+    var restructure: Restructure
+    var tempPath: String = ""
+
+    init() throws {
+        tempPath = testPath(description: "Initialization Tests")
+        restructure = try Restructure(path: tempPath)
     }
 
-    func testJournalModeDefault() throws {
-        restructure = try Restructure(path: tempPath)
-        XCTAssertEqual(restructure!.journalMode, .wal)
-        restructure!.close()
+    deinit {
+        restructure.close()
+        try? FileManager.default.removeItem(atPath: tempPath)
+    }
+
+    @Test func journalModeDefault() throws {
+        #expect(restructure.journalMode == .wal)
+        restructure.close()
 
         restructure = try Restructure()
-        XCTAssertEqual(restructure!.journalMode, .memory)
-        restructure!.close()
+        #expect(restructure.journalMode == .memory)
     }
 
-    func testJournalModeSettable() throws {
-        for mode in JournalMode.allCases {
-            restructure = try Restructure(path: tempPath, journalMode: mode)
-            XCTAssertEqual(restructure!.journalMode, mode)
-            restructure!.close()
-        }
+    @Test(arguments: JournalMode.allCases)
+    func journalModeSettable(mode: JournalMode) throws {
+        restructure = try Restructure(path: tempPath, journalMode: mode)
+        #expect(restructure.journalMode == mode)
+        restructure.close()
     }
 
-    func testSecureDeleteSettable() throws {
-        for mode in SecureDelete.allCases {
-            restructure = try Restructure(path: tempPath)
-            restructure!.secureDelete = mode
-
-            let newMode = restructure!.secureDelete
-            XCTAssertEqual(newMode, mode)
-
-            restructure!.close()
-        }
+    @Test(arguments: SecureDelete.allCases)
+    func secureDeleteSettable(mode: SecureDelete) throws {
+        restructure.secureDelete = mode
+        #expect(restructure.secureDelete == mode)
+        restructure.close()
     }
 
-    func testAutoVacuumSettable() throws {
-        for mode in AutoVacuum.allCases {
-            restructure = try Restructure(path: tempPath)
-            restructure!.autoVacuum = mode
-            restructure!.vacuum()
-
-            let newMode = restructure!.autoVacuum
-            XCTAssertEqual(newMode, mode)
-
-            restructure!.close()
-        }
-    }
-
-    func testIncrementalAutoVacuum() throws {
+    @Test(arguments: AutoVacuum.allCases)
+    func autoVacuumSettable(mode: AutoVacuum) throws {
         restructure = try Restructure(path: tempPath)
-        restructure!.autoVacuum = .incremental
-        restructure!.vacuum()
+        restructure.autoVacuum = mode
+        restructure.vacuum()
 
-        restructure!.incrementalVacuum()
-        restructure!.incrementalVacuum(pages: 2)
+        #expect(restructure.autoVacuum == mode)
 
-        XCTSuccess()
-
-        restructure!.close()
+        restructure.close()
     }
+
+    @Test func incrementalAutoVacuum() throws {
+        restructure.autoVacuum = .incremental
+        restructure.vacuum()
+
+        restructure.incrementalVacuum()
+        restructure.incrementalVacuum(pages: 2)
+
+        restructure.close()
+    }
+}
+
+func testLocalRoot() -> URL {
+    let tempPath = NSTemporaryDirectory()
+    let tempUrl = URL(fileURLWithPath: tempPath)
+
+    return tempUrl
+}
+
+func testPath(description: String) -> String {
+    return testURL(description: description).path
+}
+
+func testURL(description: String) -> URL {
+    let uuid = UUID().uuidString
+    let uniqueName = "Restructure \(description) \(uuid).data"
+
+    return testLocalRoot().appendingPathComponent(uniqueName)
 }

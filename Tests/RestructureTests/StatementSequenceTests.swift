@@ -6,24 +6,21 @@
 //  SPDX-License-Identifier: MIT
 //
 
-import XCTest
+import Foundation
+import Testing
+
 @testable import Restructure
 
-class StatementSequenceTests: XCTestCase {
+struct StatementSequenceTests {
 
-    var restructure: Restructure!
+    var restructure: Restructure
 
-    override func setUpWithError() throws {
+    init() throws {
         restructure = try Restructure()
         try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b INT)")
     }
 
-    override func tearDown() {
-        restructure.close()
-        restructure = nil
-    }
-
-    func testEmptySequenceResults() throws {
+    @Test func emptySequenceResults() throws {
         let statement = try restructure.prepare(query: "SELECT a, b FROM foo")
 
         var count = 0
@@ -32,10 +29,10 @@ class StatementSequenceTests: XCTestCase {
             count += 1
         }
 
-        XCTAssertEqual(count, 0)
+        #expect(count == 0)
     }
 
-    func testFullSequenceResults() throws {
+    @Test func fullSequenceResults() throws {
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
 
         insertStatement.bind(value: 1, for: "b")
@@ -59,10 +56,10 @@ class StatementSequenceTests: XCTestCase {
             count += 1
         }
 
-        XCTAssertEqual(count, 3)
+        #expect(count == 3)
     }
 
-    func testPartialSequenceResults() throws {
+    @Test func partialSequenceResults() throws {
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (b) VALUES (:b)")
 
         insertStatement.bind(value: 1, for: "b")
@@ -87,7 +84,6 @@ class StatementSequenceTests: XCTestCase {
             count += 1
         }
 
-        XCTAssertEqual(count, 2)
+        #expect(count == 2)
     }
-
 }

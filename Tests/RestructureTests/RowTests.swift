@@ -6,29 +6,27 @@
 //  SPDX-License-Identifier: MIT
 //
 
-import XCTest
+import Foundation
+import Numerics
+import Testing
+
 @testable import Restructure
 
-class RowTests: XCTestCase {
+struct RowTests {
 
     // MARK: - Properties
 
-    var restructure: Restructure!
+    let restructure: Restructure
 
     // MARK: - Set Up & Tear Down
 
-    override func setUpWithError() throws {
+    init() throws {
         restructure = try Restructure()
-    }
-
-    override func tearDown() {
-        restructure.close()
-        restructure = nil
     }
 
     // MARK: - Boolean Tests
 
-    func testBool() throws {
+    @Test func Bool() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -45,25 +43,25 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Bool = row1["a"]
-        XCTAssertFalse(value1)
+        #expect(!value1)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Bool = row2["a"]
-        XCTAssertTrue(value2)
+        #expect(value2)
     }
 
     // MARK: - Signed Integer Tests
 
-    func testInt() throws {
+    @Test func int() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -86,31 +84,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Int = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Int = row2["a"]
-        XCTAssertEqual(value2, Int.min)
+        #expect(value2 == Int.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: Int = row3["a"]
-        XCTAssertEqual(value3, Int.max)
+        #expect(value3 == Int.max)
     }
 
-    func testInt8() throws {
+    @Test func int8() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -133,31 +131,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Int8 = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Int8 = row2["a"]
-        XCTAssertEqual(value2, Int8.min)
+        #expect(value2 == Int8.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: Int8 = row3["a"]
-        XCTAssertEqual(value3, Int8.max)
+        #expect(value3 == Int8.max)
     }
 
-    func testInt16() throws {
+    @Test func int16() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -180,31 +178,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Int16 = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Int16 = row2["a"]
-        XCTAssertEqual(value2, Int16.min)
+        #expect(value2 == Int16.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: Int16 = row3["a"]
-        XCTAssertEqual(value3, Int16.max)
+        #expect(value3 == Int16.max)
     }
 
-    func testInt32() throws {
+    @Test func int32() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -227,31 +225,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Int32 = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Int32 = row2["a"]
-        XCTAssertEqual(value2, Int32.min)
+        #expect(value2 == Int32.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: Int32 = row3["a"]
-        XCTAssertEqual(value3, Int32.max)
+        #expect(value3 == Int32.max)
     }
 
-    func testInt64() throws {
+    @Test func int64() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -274,33 +272,33 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Int64 = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Int64 = row2["a"]
-        XCTAssertEqual(value2, Int64.min)
+        #expect(value2 == Int64.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: Int64 = row3["a"]
-        XCTAssertEqual(value3, Int64.max)
+        #expect(value3 == Int64.max)
     }
 
     // MARK: - Unsigned Integer Tests
 
-    func testUInt() throws {
+    @Test func uint() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -323,31 +321,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: UInt = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: UInt = row2["a"]
-        XCTAssertEqual(value2, UInt.min)
+        #expect(value2 == UInt.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: UInt = row3["a"]
-        XCTAssertEqual(value3, UInt.max)
+        #expect(value3 == UInt.max)
     }
 
-    func testUInt8() throws {
+    @Test func uint8() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -370,31 +368,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: UInt8 = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: UInt8 = row2["a"]
-        XCTAssertEqual(value2, UInt8.min)
+        #expect(value2 == UInt8.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: UInt8 = row3["a"]
-        XCTAssertEqual(value3, UInt8.max)
+        #expect(value3 == UInt8.max)
     }
 
-    func testUInt16() throws {
+    @Test func uint16() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -417,31 +415,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: UInt16 = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: UInt16 = row2["a"]
-        XCTAssertEqual(value2, UInt16.min)
+        #expect(value2 == UInt16.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: UInt16 = row3["a"]
-        XCTAssertEqual(value3, UInt16.max)
+        #expect(value3 == UInt16.max)
     }
 
-    func testUInt32() throws {
+    @Test func uint32() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -464,33 +462,33 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: UInt32 = row1["a"]
-        XCTAssertEqual(value1, 0)
+        #expect(value1 == 0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: UInt32 = row2["a"]
-        XCTAssertEqual(value2, UInt32.min)
+        #expect(value2 == UInt32.min)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: UInt32 = row3["a"]
-        XCTAssertEqual(value3, UInt32.max)
+        #expect(value3 == UInt32.max)
     }
 
     // MARK: - Array Tests
 
-    func testArrayBinaryPList() throws {
+    @Test func arrayBinaryPList() throws {
         restructure.arrayStrategy = .bplist
 
         try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
@@ -503,14 +501,14 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["a"], [1, 2, 3])
+        #expect(row["a"] == [1, 2, 3])
     }
 
-    func testArrayJSON() throws {
+    @Test func arrayJSON() throws {
         restructure.arrayStrategy = .json
 
         try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
@@ -523,14 +521,14 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["a"], [1, 2, 3])
+        #expect(row["a"] == [1, 2, 3])
     }
 
-    func testMultiDimensionalArrayBinaryPList() throws {
+    @Test func multiDimensionalArrayBinaryPList() throws {
         restructure.arrayStrategy = .bplist
 
         try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
@@ -543,14 +541,14 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["a"], [[1.0, 2.0, 3.0]])
+        #expect(row["a"] == [[1.0, 2.0, 3.0]])
     }
 
-    func testMultiDimensionalArrayJSON() throws {
+    @Test func multiDimensionalArrayJSON() throws {
         restructure.arrayStrategy = .json
 
         try restructure.execute(query: "CREATE TABLE foo (a BLOB, p INT)")
@@ -563,16 +561,16 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["a"], [[1.0, 2.0, 3.0]])
+        #expect(row["a"] == [[1.0, 2.0, 3.0]])
     }
 
     // MARK: - Real Tests
 
-    func testFloat() throws {
+    @Test func float() throws {
         try restructure.execute(query: "CREATE TABLE foo (a REAL, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -595,31 +593,31 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Float = row1["a"]
-        XCTAssertEqual(value1, 0.0)
+        #expect(value1 == 0.0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Float = row2["a"]
-        XCTAssertEqual(value2, Float.greatestFiniteMagnitude * -1.0)
+        #expect(value2 == Float.greatestFiniteMagnitude * -1.0)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: Float = row3["a"]
-        XCTAssertEqual(value3, Float.greatestFiniteMagnitude)
+        #expect(value3 == Float.greatestFiniteMagnitude)
     }
 
-    func testDouble() throws {
+    @Test func double() throws {
         try restructure.execute(query: "CREATE TABLE foo (a REAL, p INT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, p) VALUES (:a, :p)")
 
@@ -642,33 +640,33 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo ORDER BY p")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value1: Double = row1["a"]
-        XCTAssertEqual(value1, 0.0)
+        #expect(value1 == 0.0)
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value2: Double = row2["a"]
-        XCTAssertEqual(value2, Double.greatestFiniteMagnitude * -1.0)
+        #expect(value2 == Double.greatestFiniteMagnitude * -1.0)
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let value3: Double = row3["a"]
-        XCTAssertEqual(value3, Double.greatestFiniteMagnitude)
+        #expect(value3 == Double.greatestFiniteMagnitude)
     }
 
     // MARK: - Complex Tests
 
-    func testData() throws {
+    @Test func data() throws {
         try restructure.execute(query: "CREATE TABLE foo (a BLOB)")
 
         let data1 = Data(bytes: [0x41, 0x42, 0x43], count: 3)
@@ -680,17 +678,15 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        let data2: Data? = row["a"]
-
-        XCTAssertNotNil(data2)
-        XCTAssertEqual(data1, data2!)
+        let data2: Data = try #require(row["a"])
+        #expect(data1 == data2)
     }
 
-    func testIntegerDate() throws {
+    @Test func integerDate() throws {
         let now =  Date()
 
         try restructure.execute(query: "CREATE TABLE foo (a INT)")
@@ -703,17 +699,17 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a from foo LIMIT 1")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let date: Date = row["a"]
 
         // NOTE: Accuracy is lost because Date's time interval is down to fractions of a second, and values are stored in whole seconds
-        XCTAssertEqual(date.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1.0)
+        #expect(date.timeIntervalSince1970.isApproximatelyEqual(to: now.timeIntervalSince1970, absoluteTolerance: 1.0))
     }
 
-    func testRealDate() throws {
+    @Test func realDate() throws {
         let now =  Date()
 
         try restructure.execute(query: "CREATE TABLE foo (a REAL)")
@@ -727,17 +723,17 @@ class RowTests: XCTestCase {
         selectStatement.dateStrategy = .real
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let date: Date = row["a"]
 
         // NOTE: Accuracy is lost here, but only just slightly
-        XCTAssertEqual(date.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1.0)
+        #expect(date.timeIntervalSince1970.isApproximatelyEqual(to: now.timeIntervalSince1970, absoluteTolerance: 1.0))
     }
 
-    func testTextDate() throws {
+    @Test func textDate() throws {
         let now =  Date()
 
         try restructure.execute(query: "CREATE TABLE foo (a TEXT)")
@@ -751,17 +747,17 @@ class RowTests: XCTestCase {
         selectStatement.dateStrategy = .text
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let date: Date = row["a"]
 
         // NOTE: Accuracy is lost because Date's time interval is down to fractions of a second, and values are stored in whole seconds
-        XCTAssertEqual(date.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1.0)
+        #expect(date.timeIntervalSince1970.isApproximatelyEqual(to: now.timeIntervalSince1970, absoluteTolerance: 1.0))
     }
 
-    func testSimpleString() throws {
+    @Test func simpleString() throws {
         try restructure.execute(query: "CREATE TABLE foo (a TEXT)")
 
         let data1 = "Hello, World!"
@@ -773,17 +769,15 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        let data2: String? = row["a"]
-
-        XCTAssertNotNil(data2)
-        XCTAssertEqual(data1, data2!)
+        let data2: String = try #require(row["a"])
+        #expect(data1 == data2)
     }
 
-    func testEmojiString() throws {
+    @Test func emojiString() throws {
         try restructure.execute(query: "CREATE TABLE foo (a TEXT)")
 
         let data1 = "👨‍👨‍👧‍👧 Hello, World! 👋🏼"
@@ -795,19 +789,17 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
 
         guard case let .row(row) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        let data2: String? = row["a"]
-
-        XCTAssertNotNil(data2)
-        XCTAssertEqual(data1, data2!)
+        let data2: String = try #require(row["a"])
+        #expect(data1 == data2)
     }
 
     // MARK: - Dynamic Member Tests
 
-    func testDynamicMembers() throws {
+    @Test func dynamicMembers() throws {
         try restructure.execute(query: "CREATE TABLE foo (a INT, t TEXT)")
         let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a, t) VALUES (:a, :t)")
 
@@ -830,36 +822,36 @@ class RowTests: XCTestCase {
         let selectStatement = try restructure.prepare(query: "SELECT a, t FROM foo ORDER BY t")
 
         guard case let .row(row1) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let row1Int: Int = row1.a
         let row1String: String = row1.t
 
-        XCTAssertEqual(row1Int, 0)
-        XCTAssertEqual(row1String, "Text 0")
+        #expect(row1Int == 0)
+        #expect(row1String == "Text 0")
 
         guard case let .row(row2) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let row2Int: Int = row2.a
         let row2String: String = row2.t
 
-        XCTAssertEqual(row2Int, 1)
-        XCTAssertEqual(row2String, "Text 1")
+        #expect(row2Int == 1)
+        #expect(row2String == "Text 1")
 
         guard case let .row(row3) = selectStatement.step() else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
         let row3Int: Int = row3.a
         let row3String: String = row3.t
 
-        XCTAssertEqual(row3Int, 2)
-        XCTAssertEqual(row3String, "Text 2")
+        #expect(row3Int == 2)
+        #expect(row3String == "Text 2")
     }
 }

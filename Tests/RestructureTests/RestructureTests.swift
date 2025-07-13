@@ -6,146 +6,144 @@
 //  SPDX-License-Identifier: MIT
 //
 
-import XCTest
+import Foundation
+import Testing
+
 @testable import Restructure
 
-class RestructureTests: XCTestCase {
+struct RestructureTests {
 
-    var restructure: Restructure!
+    let restructure: Restructure
 
-    override func setUpWithError() throws {
+    init() throws {
         restructure = try Restructure()
-    }
-
-    override func tearDown() {
-        restructure.close()
-        restructure = nil
     }
 
     // MARK: - User Version Tests
 
-    func testUserVersionStartsAtZero() throws {
-        restructure = try Restructure()
-        XCTAssertEqual(restructure!.userVersion, 0)
+    @Test func userVersionStartsAtZero() throws {
+        #expect(restructure.userVersion == 0)
     }
 
-    func testUserVersionIsUpdatable() throws {
-        restructure = try Restructure()
-        restructure!.userVersion = 42
-
-        XCTAssertEqual(restructure!.userVersion, 42)
+    @Test func userVersionIsUpdatable() throws {
+        restructure.userVersion = 42
+        #expect(restructure.userVersion == 42)
     }
 
     // MARK: - Execution Tests
 
-    func testExecutingInvalidQuery() throws {
-        XCTAssertThrowsError(try restructure.execute(query: "FOO BAR BAZ"))
+    @Test func executingInvalidQuery() throws {
+        #expect(throws: RestructureError.self) {
+            try restructure.execute(query: "FOO BAR BAZ")
+        }
     }
 
-    func testExecutingValidQuery() throws {
-        XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INT)"))
+    @Test func executingValidQuery() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT)")
     }
 
-    func testExecutingMultipleValidQueries() throws {
-        XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INT); INSERT INTO foo (a) VALUES(42);"))
+    @Test func executingMultipleValidQueries() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INT); INSERT INTO foo (a) VALUES(42);")
 
         let statement = try restructure.prepare(query: "SELECT a FROM foo LIMIT 1")
         let result = statement.step()
 
-        switch result {
-        case let .row(row):
-            XCTAssertEqual(row["a"], 42)
-        default:
-            XCTFail("Failed to get a row")
+        guard case .row(let row) = result else {
+            Issue.record("Failed to get a row")
+            return
         }
+
+        #expect(row["a"] == 42)
     }
 
     // MARK: - Last Inserted ID Tests
 
-    func testLastInsertedIdReturnsZeroWithNoInserts() throws {
-        XCTAssertEqual(0, restructure.lastInsertedId)
+    @Test func lastInsertedIdReturnsZeroWithNoInserts() throws {
+        #expect(restructure.lastInsertedId == 0)
     }
 
-    func testLastInsertedIdReturnsNonZeroWithInserts() throws {
-        XCTAssertNoThrow(try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b INT); INSERT INTO foo (b) VALUES(42);"))
-        XCTAssertGreaterThan(restructure.lastInsertedId, 0)
+    @Test func lastInsertedIdReturnsNonZeroWithInserts() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b INT); INSERT INTO foo (b) VALUES(42);")
+        #expect(restructure.lastInsertedId > 0)
     }
 
     // MARK: - SQLite Version Tests
 
-    func testSQLiteVersionExists() throws {
+    @Test func sqliteVersionExists() throws {
         let version = restructure.sqliteVersion
-        XCTAssertFalse(version.isEmpty)
+        #expect(!version.isEmpty)
     }
 
     // MARK: - Migration Tests
 
-    func testMigrationNeedDetectable() throws {
-        XCTAssertFalse(restructure.needsMigration(targetVersion: 0))
-        XCTAssertTrue(restructure.needsMigration(targetVersion: 1))
+    @Test func migrationNeedDetectable() throws {
+        #expect(!restructure.needsMigration(targetVersion: 0))
+        #expect(restructure.needsMigration(targetVersion: 1))
 
         restructure.userVersion = 42
 
-        XCTAssertFalse(restructure.needsMigration(targetVersion: 40))
-        XCTAssertFalse(restructure.needsMigration(targetVersion: 41))
-        XCTAssertFalse(restructure.needsMigration(targetVersion: 42))
-        XCTAssertTrue(restructure.needsMigration(targetVersion: 43))
-        XCTAssertTrue(restructure.needsMigration(targetVersion: 44))
+        #expect(!restructure.needsMigration(targetVersion: 40))
+        #expect(!restructure.needsMigration(targetVersion: 41))
+        #expect(!restructure.needsMigration(targetVersion: 42))
+        #expect(restructure.needsMigration(targetVersion: 43))
+        #expect(restructure.needsMigration(targetVersion: 44))
     }
 
-    func testMigrationWorksInitially() throws {
-        XCTAssertEqual(restructure.userVersion, 0)
+    @Test func migrationWorksInitially() throws {
+        #expect(restructure.userVersion == 0)
 
-        XCTAssertNoThrow(try restructure.migrate(version: 1) {
+        try restructure.migrate(version: 1) {
             try $0.execute(query: "CREATE TABLE foo (A INT)")
-        })
+        }
 
-        XCTAssertEqual(restructure.userVersion, 1)
+        #expect(restructure.userVersion == 1)
     }
 
-    func testMigrationWorksSerially() throws {
-        XCTAssertEqual(restructure.userVersion, 0)
+    @Test func migrationWorksSerially() throws {
+        #expect(restructure.userVersion == 0)
 
-        XCTAssertNoThrow(try restructure.migrate(version: 1) {
+        try restructure.migrate(version: 1) {
             try $0.execute(query: "CREATE TABLE foo (A INT)")
-        })
+        }
 
-        XCTAssertNoThrow(try restructure.migrate(version: 2) {
+        try restructure.migrate(version: 2) {
             try $0.execute(query: "CREATE TABLE bar (A INT)")
-        })
+        }
 
-        XCTAssertEqual(restructure.userVersion, 2)
+        #expect(restructure.userVersion == 2)
     }
 
-    func testMigrationFailsOutOfSequence() throws {
-        XCTAssertEqual(restructure.userVersion, 0)
+    @Test func migrationFailsOutOfSequence() throws {
+        #expect(restructure.userVersion == 0)
 
-        XCTAssertThrowsError(try restructure.migrate(version: 2) {
-            try $0.execute(query: "CREATE TABLE foo (A INT)")
-        })
+        #expect(throws: RestructureError.self) {
+            try restructure.migrate(version: 2) {
+                try $0.execute(query: "CREATE TABLE foo (A INT)")
+            }
+        }
 
-        XCTAssertEqual(restructure.userVersion, 0)
+        #expect(restructure.userVersion == 0)
     }
 
-    func testMigrationSkipsIfDone() throws {
-        XCTAssertEqual(restructure.userVersion, 0)
+    @Test func migrationSkipsIfDone() throws {
+        #expect(restructure.userVersion == 0)
 
-        XCTAssertNoThrow(try restructure.migrate(version: 1) {
+        try restructure.migrate(version: 1) {
             try $0.execute(query: "CREATE TABLE foo (A INT)")
-        })
+        }
 
-        XCTAssertEqual(try getFooCount(), 0)
+        #expect(try getFooCount() == 0)
 
-        XCTAssertNoThrow(try restructure.migrate(version: 1) {
+        try restructure.migrate(version: 1) {
             try $0.execute(query: "INSERT INTO foo (a) VALUES (1)")
-        })
+        }
 
-        XCTAssertEqual(try getFooCount(), 0)
+        #expect(try getFooCount() == 0)
     }
 
     // MARK: - Custom Function Tests
 
-    func testUpperFunctionWithStandardString() throws {
+    @Test func upperFunctionWithStandardString() throws {
         // Create a table that stores strings
         try restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
 
@@ -158,14 +156,14 @@ class RestructureTests: XCTestCase {
         fetchStatement.bind(value: id, for: "id")
 
         guard case .row(let row) = fetchStatement.step() else {
-            XCTFail("Failed to get inserted data")
+            Issue.record("Failed to get inserted data")
             return
         }
 
-        XCTAssertEqual(row["value"], "HELLO")
+        #expect(row["value"] == "HELLO")
     }
 
-    func testUpperFunctionWithComplexString() throws {
+    @Test func upperFunctionWithComplexString() throws {
         // Create a table that stores strings
         try restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
 
@@ -178,14 +176,14 @@ class RestructureTests: XCTestCase {
         fetchStatement.bind(value: id, for: "id")
 
         guard case .row(let row) = fetchStatement.step() else {
-            XCTFail("Failed to get inserted data")
+            Issue.record("Failed to get inserted data")
             return
         }
 
-        XCTAssertEqual(row["value"], "👋🏻 HELLO 👋🏼")
+        #expect(row["value"] == "👋🏻 HELLO 👋🏼")
     }
 
-    func testUpperFunctionWithUnicodeString() throws {
+    @Test func upperFunctionWithUnicodeString() throws {
         // Create a table that stores strings
         try restructure.execute(query: "CREATE TABLE foo (id INTEGER PRIMARY KEY, value TEXT)")
 
@@ -198,11 +196,11 @@ class RestructureTests: XCTestCase {
         fetchStatement.bind(value: id, for: "id")
 
         guard case .row(let row) = fetchStatement.step() else {
-            XCTFail("Failed to get inserted data")
+            Issue.record("Failed to get inserted data")
             return
         }
 
-        XCTAssertEqual(row["value"], "EXÁMPLE ÓÓSSCHLOË")
+        #expect(row["value"] == "EXÁMPLE ÓÓSSCHLOË")
     }
 
     // MARK: - Utilities

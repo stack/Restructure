@@ -9,7 +9,7 @@
 import Foundation
 
 /// The journaling mode used by the database.
-public enum JournalMode: CaseIterable, PragmaRepresentable {
+public enum JournalMode: CaseIterable, PragmaRepresentable, Sendable {
     /// The rollback journal is deleted after a transaction.
     case delete
     /// The rollback journal exists in-memory. This is the default for an in-memory database.

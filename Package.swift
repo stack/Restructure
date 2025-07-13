@@ -15,6 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
         .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.59.1")
     ],
     targets: [
@@ -27,7 +28,10 @@ let package = Package(
         ),
         .testTarget(
             name: "RestructureTests",
-            dependencies: ["Restructure"],
+            dependencies: [
+                "Restructure",
+                .product(name: "Numerics", package: "swift-numerics")
+            ],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]

@@ -6,24 +6,21 @@
 //  SPDX-License-Identifier: MIT
 //
 
-import XCTest
+import Foundation
+import Testing
+
 @testable import Restructure
 
-class StatementEncoderTests: XCTestCase {
+struct StatementEncoderTests {
 
-    var restructure: Restructure!
+    var restructure: Restructure
 
-    override func setUpWithError() throws {
+    init() throws {
         restructure = try Restructure()
         try restructure.execute(query: "CREATE TABLE foo (a INTEGER PRIMARY KEY AUTOINCREMENT, b TEXT, c REAL, d INT, e BLOB)")
     }
 
-    override func tearDown() {
-        restructure.close()
-        restructure = nil
-    }
-
-    func testSimpleEncodable() throws {
+    @Test func simpleEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let b: String
@@ -37,13 +34,12 @@ class StatementEncoderTests: XCTestCase {
         let foo = Foo(a: nil, b: "1", c: 2.0, d: 3, e: Data(bytes: [0x4, 0x5, 0x6], count: 3))
 
         let encoder = StatementEncoder()
-
-        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        try encoder.encode(foo, to: statement)
 
         var result = statement.step()
 
         guard case .done = result else {
-            XCTFail("Failed to insert data")
+            Issue.record("Failed to insert data")
             return
         }
 
@@ -52,17 +48,17 @@ class StatementEncoderTests: XCTestCase {
         result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["b"], "1")
-        XCTAssertEqual(row["c"], 2.0)
-        XCTAssertEqual(row["d"], 3)
-        XCTAssertEqual(row["e"], Data(bytes: [0x4, 0x5, 0x6], count: 3))
+        #expect(row["b"] == "1")
+        #expect(row["c"] == 2.0)
+        #expect(row["d"] == 3)
+        #expect(row["e"] == Data(bytes: [0x4, 0x5, 0x6], count: 3))
     }
 
-    func testEmojiStringEncodable() throws {
+    @Test func emojiStringEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let b: String
@@ -73,13 +69,12 @@ class StatementEncoderTests: XCTestCase {
         let foo = Foo(a: nil, b: "👋🏻 HELLO 👋🏼")
 
         let encoder = StatementEncoder()
-
-        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        try encoder.encode(foo, to: statement)
 
         var result = statement.step()
 
         guard case .done = result else {
-            XCTFail("Failed to insert data")
+            Issue.record("Failed to insert data")
             return
         }
 
@@ -88,14 +83,14 @@ class StatementEncoderTests: XCTestCase {
         result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["b"], "👋🏻 HELLO 👋🏼")
+        #expect(row["b"] == "👋🏻 HELLO 👋🏼")
     }
 
-    func testUnicodeStringEncodable() throws {
+    @Test func unicodeStringEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let b: String
@@ -106,13 +101,12 @@ class StatementEncoderTests: XCTestCase {
         let foo = Foo(a: nil, b: "exámple óóßChloë")
 
         let encoder = StatementEncoder()
-
-        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        try encoder.encode(foo, to: statement)
 
         var result = statement.step()
 
         guard case .done = result else {
-            XCTFail("Failed to insert data")
+            Issue.record("Failed to insert data")
             return
         }
 
@@ -121,14 +115,14 @@ class StatementEncoderTests: XCTestCase {
         result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["b"], "exámple óóßChloë")
+        #expect(row["b"] == "exámple óóßChloë")
     }
 
-    func testArrayEncodable() throws {
+    @Test func arrayEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let e: [Int]
@@ -139,13 +133,12 @@ class StatementEncoderTests: XCTestCase {
         let foo = Foo(a: nil, e: [1, 2, 3])
 
         let encoder = StatementEncoder()
-
-        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        try encoder.encode(foo, to: statement)
 
         var result = statement.step()
 
         guard case .done = result else {
-            XCTFail("Failed to insert data")
+            Issue.record("Failed to insert data")
             return
         }
 
@@ -154,14 +147,14 @@ class StatementEncoderTests: XCTestCase {
         result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["e"], [1, 2, 3])
+        #expect(row["e"] == [1, 2, 3])
     }
 
-    func testMultiArrayEncodable() throws {
+    @Test func multiArrayEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?
             let e: [[Int]]
@@ -172,13 +165,12 @@ class StatementEncoderTests: XCTestCase {
         let foo = Foo(a: nil, e: [[1, 2, 3]])
 
         let encoder = StatementEncoder()
-
-        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        try encoder.encode(foo, to: statement)
 
         var result = statement.step()
 
         guard case .done = result else {
-            XCTFail("Failed to insert data")
+            Issue.record("Failed to insert data")
             return
         }
 
@@ -187,14 +179,14 @@ class StatementEncoderTests: XCTestCase {
         result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["e"], [[1, 2, 3]])
+        #expect(row["e"] == [[1, 2, 3]])
     }
 
-    func testEncodingEnumRawValues() throws {
+    @Test func encodingEnumRawValues() throws {
         enum FooType: Int, Encodable {
             case one = 0
             case two = 1
@@ -212,13 +204,12 @@ class StatementEncoderTests: XCTestCase {
         let foo = Foo(id: nil, type: .two)
 
         let encoder = StatementEncoder()
-
-        XCTAssertNoThrow(try encoder.encode(foo, to: statement))
+        try encoder.encode(foo, to: statement)
 
         var result = statement.step()
 
         guard case .done = result else {
-            XCTFail("Failed to insert data")
+            Issue.record("Failed to insert data")
             return
         }
 
@@ -227,14 +218,14 @@ class StatementEncoderTests: XCTestCase {
         result = selectStatement.step()
 
         guard case let .row(row) = result else {
-            XCTFail("Failed to fetch row")
+            Issue.record("Failed to fetch row")
             return
         }
 
-        XCTAssertEqual(row["type"], 1)
+        #expect(row["type"] == 1)
     }
 
-    func testEncodingNil() throws {
+    @Test func encodingNil() throws {
         struct Foo: Encodable {
             let id: Int64
             let name: String?
@@ -252,7 +243,7 @@ class StatementEncoderTests: XCTestCase {
         try encoder.encode(foo1, to: insertStatement)
 
         guard case .done = insertStatement.step() else {
-            XCTFail("Failed to insert first row")
+            Issue.record("Failed to insert first row")
             return
         }
 
@@ -262,7 +253,7 @@ class StatementEncoderTests: XCTestCase {
         try encoder.encode(foo2, to: insertStatement)
 
         guard case .done = insertStatement.step() else {
-            XCTFail("Failed to insert second row")
+            Issue.record("Failed to insert second row")
             return
         }
 
@@ -272,33 +263,33 @@ class StatementEncoderTests: XCTestCase {
         try encoder.encode(foo3, to: insertStatement)
 
         guard case .done = insertStatement.step() else {
-            XCTFail("Failed to insert second row")
+            Issue.record("Failed to insert second row")
             return
         }
 
         let fetchAllStatement = try restructure.prepare(query: "SELECT COUNT(id) AS count FROM foobar")
 
         guard case .row(let allRow) = fetchAllStatement.step(), let allCount: Int = allRow["count"] else {
-            XCTFail("Failed to get all count")
+            Issue.record("Failed to get all count")
             return
         }
 
         let fetchNilNameStatement = try restructure.prepare(query: "SELECT COUNT(id) AS count FROM foobar WHERE name IS NULL")
 
         guard case .row(let nilNameRow) = fetchNilNameStatement.step(), let nilNameCount: Int = nilNameRow["count"] else {
-            XCTFail("Failed to get nil name count")
+            Issue.record("Failed to get nil name count")
             return
         }
 
         let fetchNilValueStatement = try restructure.prepare(query: "SELECT COUNT(id) AS count FROM foobar WHERE value IS NULL")
 
         guard case .row(let nilValueRow) = fetchNilValueStatement.step(), let nilValueCount: Int = nilValueRow["count"] else {
-            XCTFail("Failed to get nil value count")
+            Issue.record("Failed to get nil value count")
             return
         }
 
-        XCTAssertEqual(allCount, 3)
-        XCTAssertEqual(nilNameCount, 1)
-        XCTAssertEqual(nilValueCount, 1)
+        #expect(allCount == 3)
+        #expect(nilNameCount == 1)
+        #expect(nilValueCount == 1)
     }
 }
