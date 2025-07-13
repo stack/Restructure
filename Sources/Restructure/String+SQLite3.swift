@@ -2,19 +2,19 @@
 //  String+SQLite3.swift
 //  Restructure
 //
-//  Created by Stephen H. Gerstacker on 11/3/18.
+//  Created by Stephen H. Gerstacker on 2018-11-03.
 //  SPDX-License-Identifier: MIT
 //
 
 import Foundation
 import SQLite3
 
-internal extension String {
+extension String {
     static func from(sqliteResult: Int32) -> String? {
-        if let message = sqlite3_errstr(sqliteResult) {
-            return String(validatingUTF8: message)
+        guard let message = sqlite3_errstr(sqliteResult) else {
+            return nil
         }
-        
-        return nil
+
+        return String(validatingCString: message)
     }
 }

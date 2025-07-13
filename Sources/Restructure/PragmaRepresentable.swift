@@ -2,7 +2,7 @@
 //  PragmaRepresentable.swift
 //  Restructure
 //
-//  Created by Stephen H. Gerstacker on 8/12/19.
+//  Created by Stephen H. Gerstacker on 2019-08-12.
 //  SPDX-License-Identifier: MIT
 //
 
@@ -16,18 +16,17 @@ protocol PragmaRepresentable {
     static func from(value: PragmaType) -> Self
     /// Convert the representable type to the SQlite value.
     var pragmaValue: PragmaType { get }
-    
 }
 
 extension Int: PragmaRepresentable {
-    
+
     /// Integer conversion from an SQlite value to an `Int`.
     static func from(value: Int) -> Int {
-        return value
+        value
     }
-    
+
     /// Integer conversion from an `Int` to a SQlite value.
     var pragmaValue: Int {
-        return self
+        self
     }
 }

@@ -91,7 +91,6 @@ Restructure currently supports the following data types:
 *   String
 *   Array
 
-
 ### Statements Are Sequences
 
 To help with fetching data, all statements are `Sequence` types and can be
@@ -112,7 +111,6 @@ for row in statement {
 Restructure supports storing arrays of data. This is done by encoding the data
 and storing it like a normal value. Encoding can either be done with binary
 plists or JSON.
-
 
 ```swift
 // Make all arrays in Restructure binary plists
@@ -179,12 +177,11 @@ struct Foo: Encodable {
 
 let statement = try! restructure.prepare(query: "SELECT a, b, c, d, e FROM foo LIMIT 1")
 let decoder = RowDecoder()
-        
+
 for row in statement }
     let foo = try! decoder.decode(Foo.self, from: row)
 }
 ```
-
 
 ### Rows support Dynamic Member Lookup
 
@@ -232,4 +229,3 @@ supported.
 
 `UInt64` is not supported as a data type, as SQLite only supports signed 64-bit
 integers.
-

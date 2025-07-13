@@ -19,7 +19,7 @@ func XCTSuccess(_ message: String) {
 func testLocalRoot() -> URL {
     let tempPath = NSTemporaryDirectory()
     let tempUrl = URL(fileURLWithPath: tempPath)
-    
+
     return tempUrl
 }
 
@@ -30,6 +30,6 @@ func testPath(description: String) -> String {
 func testURL(description: String) -> URL {
     let uuid = UUID().uuidString
     let uniqueName = "Restructure \(description) \(uuid).data"
-    
+
     return testLocalRoot().appendingPathComponent(uniqueName)
 }

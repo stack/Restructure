@@ -2,7 +2,7 @@
 //  SecureDelete.swift
 //  Restructure
 //
-//  Created by Stephen H. Gerstacker on 8/12/19.
+//  Created by Stephen H. Gerstacker on 2019-08-12.
 //  SPDX-License-Identifier: MIT
 //
 
@@ -10,14 +10,14 @@ import Foundation
 
 /// The delete mode used when removing data.
 public enum SecureDelete: CaseIterable, PragmaRepresentable {
-    /// Deleted data is zeroed
-    case on
-    /// Deleted data is not zeroed
-    case off
     /// Deleted data is zeroed only when it exists on the filesystem
     case fast
-    
-    static func from(value: String) -> SecureDelete {
+    /// Deleted data is not zeroed
+    case off
+    /// Deleted data is zeroed
+    case on
+
+    static func from(value: String) -> Self {
         switch value.uppercased() {
         case "1":
             return .on
@@ -29,7 +29,7 @@ public enum SecureDelete: CaseIterable, PragmaRepresentable {
             fatalError("Unsupported SecureDelete string: \(value)")
         }
     }
-    
+
     var pragmaValue: String {
         switch self {
         case .on:

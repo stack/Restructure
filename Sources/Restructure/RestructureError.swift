@@ -2,7 +2,7 @@
 //  RestructureError.swift
 //  Restructure
 //
-//  Created by Stephen H. Gerstacker on 11/3/18.
+//  Created by Stephen H. Gerstacker on 2018-11-03.
 //  SPDX-License-Identifier: MIT
 //
 
@@ -13,11 +13,11 @@ import SQLite3
 public enum RestructureError: Error {
     /// An error unrelated to SQLite
     case error(String)
-    
+
     /// An error related to SQLite
     case internalError(Int32, String)
-    
-    internal static func from(result: Int32) -> RestructureError {
+
+    internal static func from(result: Int32) -> Self {
         if let message = String.from(sqliteResult: result) {
             return internalError(result, message)
         } else {

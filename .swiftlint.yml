@@ -1,0 +1,51 @@
+disabled_rules:
+  - closure_body_length
+  - colon
+  - conditional_returns_on_newline
+  - contrasted_opening_brace
+  - cyclomatic_complexity
+  - direct_return
+  - explicit_acl
+  - explicit_enum_raw_value
+  - explicit_top_level_acl
+  - explicit_type_interface
+  - file_length
+  - file_name
+  - file_types_order
+  - function_body_length
+  - function_default_parameter_at_end
+  - line_length
+  - no_grouping_extension
+  - no_magic_numbers
+  - one_declaration_per_file
+  - prefixed_toplevel_constant
+  - redundant_optional_initialization
+  - redundant_type_annotation
+  - required_deinit
+  - superfluous_else
+  - switch_case_on_newline
+  - type_body_length
+  - type_contents_order
+  - vertical_whitespace_between_cases
+  - vertical_whitespace_opening_braces
+
+opt_in_rules: all
+
+attributes:
+  always_on_same_line: ["@AppStorage", "@Environment", "@UIApplicationDelegateAdaptor"]
+
+identifier_name:
+  excluded: ["^db$", "^on$", "^id$", "^to$"]
+
+file_header:
+  required_pattern: |
+                    \/\/
+                    \/\/  .*?\.swift
+                    \/\/  Restructure
+                    \/\/
+                    \/\/  Created by .*? on \d{4}-\d{2}-\d{2}\.
+                    \/\/  SPDX-License-Identifier: MIT
+                    \/\/
+
+force_unwrapping:
+  severity: error

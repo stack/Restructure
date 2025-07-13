@@ -1,10 +1,11 @@
-// swift-tools-version:5.10
+// swift-tools-version:6.1
+
 import PackageDescription
 
 let package = Package(
     name: "Restructure",
     platforms: [
-        .macOS(.v10_14), .iOS(.v12), .tvOS(.v12), .watchOS(.v5)
+        .macOS(.v14), .iOS(.v17), .tvOS(.v17), .watchOS(.v9), .visionOS(.v2)
     ],
     products: [
         .library(
@@ -12,12 +13,17 @@ let package = Package(
             targets: ["Restructure"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.59.1")
+    ],
     targets: [
         .target(
             name: "Restructure",
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
-            ]),
+            ],
+            plugins: [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")],
+        ),
         .testTarget(
             name: "RestructureTests",
             dependencies: ["Restructure"],

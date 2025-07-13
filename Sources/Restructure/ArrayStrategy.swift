@@ -2,7 +2,7 @@
 //  ArrayStrategy.swift
 //  Restructure
 //
-//  Created by Stephen H. Gerstacker on 11/10/18.
+//  Created by Stephen H. Gerstacker on 2018-11-10.
 //  SPDX-License-Identifier: MIT
 //
 
@@ -12,7 +12,7 @@ import Foundation
 public enum ArrayStrategy {
     /// The array is encoded as a binary plist.
     case bplist
-    
+
     /// The array is encoded as JSON.
     case json
 }

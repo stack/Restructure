@@ -2,21 +2,24 @@
 //  RowDecoder.swift
 //  Restructure
 //
-//  Created by Stephen H. Gerstacker on 11/15/18.
+//  Created by Stephen H. Gerstacker on 2018-11-15.
 //  SPDX-License-Identifier: MIT
 //
 
 import Foundation
 
+/// A decoder for converting ``Row`` results in to ``Decodable`` types.
 public class RowDecoder {
-    
+
     // MARK: - Initialization
-    
+
     /// Initializes `self` with the default strategies.
-    public init() { }
-    
+    public init() {
+        // NOTE: Empty initializer for public consumption.
+    }
+
     // MARK: - Decoding
-    
+
     /// Decodes a Row in to a given decodable type.
     ///
     /// - Parameter type: The type to attempt to decode to.
@@ -24,273 +27,321 @@ public class RowDecoder {
     ///
     /// - Throws: `Error` if the decoding is not possible.
     public func decode<T : Decodable>(_ type: T.Type, from row: Row) throws -> T {
-        let decoder = _RowDecoder(referencing: row)
-        
+        let decoder = InnerRowDecoder(referencing: row)
+
         return try type.init(from: decoder)
     }
 }
 
-fileprivate class _RowDecoder : Decoder {
-    fileprivate let row: Row
-    
-    fileprivate(set) var codingPath: [CodingKey]
-    fileprivate var currentKeys: [CodingKey] = []
-    
+private class InnerRowDecoder : Decoder {
+    let row: Row
+
+    private(set) var codingPath: [CodingKey]
+    var currentKeys: [CodingKey] = []
+
     var userInfo: [CodingUserInfoKey : Any] = [:]
-    
-    fileprivate init(referencing row: Row, at codingPath: [CodingKey] = []) {
+
+    init(referencing row: Row, at codingPath: [CodingKey] = []) {
         self.codingPath = codingPath
         self.row = row
     }
-    
-    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
-        let container = _RowKeyedDecodingContainer<Key>(referencing: self, wrapping: row)
+
+    func container<Key>(keyedBy _: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
+        let container = InnerRowKeyedDecodingContainer<Key>(referencing: self, wrapping: row)
         return KeyedDecodingContainer(container)
     }
-    
+
     func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-        precondition(!currentKeys.isEmpty, "Empty current keys")
-        
-        let rawData: Data = row[currentKeys.last!.stringValue]
-        
-        let container = _RowUnkeyedDecodingContainer(referencing: self, wrapping: rawData)
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
+        let rawData: Data = row[key.stringValue]
+
+        let container = InnerRowUnkeyedDecodingContainer(referencing: self, wrapping: rawData)
         return container
     }
-    
+
     func singleValueContainer() throws -> SingleValueDecodingContainer {
-        return self
+        self
     }
 }
 
-extension _RowDecoder: SingleValueDecodingContainer {
+extension InnerRowDecoder: SingleValueDecodingContainer {
+
     func decodeNil() -> Bool {
-        let key = currentKeys.last!
+        guard let key = currentKeys.last else {
+            return true
+        }
+
         return row.columnIsNull(key: key.stringValue)
     }
-    
-    func decode(_ type: Bool.Type) throws -> Bool {
-        let key = currentKeys.last!
+
+    func decode(_: Bool.Type) throws -> Bool {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: String.Type) throws -> String {
-        let key = currentKeys.last!
+
+    func decode(_: String.Type) throws -> String {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: Double.Type) throws -> Double {
-        let key = currentKeys.last!
+
+    func decode(_: Double.Type) throws -> Double {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: Float.Type) throws -> Float {
-        let key = currentKeys.last!
+
+    func decode(_: Float.Type) throws -> Float {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: Int.Type) throws -> Int {
-        let key = currentKeys.last!
+
+    func decode(_: Int.Type) throws -> Int {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: Int8.Type) throws -> Int8 {
-        let key = currentKeys.last!
+
+    func decode(_: Int8.Type) throws -> Int8 {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: Int16.Type) throws -> Int16 {
-        let key = currentKeys.last!
+
+    func decode(_: Int16.Type) throws -> Int16 {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: Int32.Type) throws -> Int32 {
-        let key = currentKeys.last!
+
+    func decode(_: Int32.Type) throws -> Int32 {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: Int64.Type) throws -> Int64 {
-        let key = currentKeys.last!
+
+    func decode(_: Int64.Type) throws -> Int64 {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: UInt.Type) throws -> UInt {
-        let key = currentKeys.last!
+
+    func decode(_: UInt.Type) throws -> UInt {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: UInt8.Type) throws -> UInt8 {
-        let key = currentKeys.last!
+
+    func decode(_: UInt8.Type) throws -> UInt8 {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: UInt16.Type) throws -> UInt16 {
-        let key = currentKeys.last!
+
+    func decode(_: UInt16.Type) throws -> UInt16 {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: UInt32.Type) throws -> UInt32 {
-        let key = currentKeys.last!
+
+    func decode(_: UInt32.Type) throws -> UInt32 {
+        guard let key = currentKeys.last else {
+            throw RestructureError.error("Empty current keys")
+        }
+
         return row[key.stringValue]
     }
-    
-    func decode(_ type: UInt64.Type) throws -> UInt64 {
+
+    func decode(_: UInt64.Type) throws -> UInt64 {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "Decoding UInt64 is not supported"))
     }
-    
+
     func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "Decoding \(type) is not supported"))
     }
 }
 
-fileprivate struct _RowKeyedDecodingContainer<K : CodingKey> : KeyedDecodingContainerProtocol {
+private struct InnerRowKeyedDecodingContainer<K : CodingKey> : KeyedDecodingContainerProtocol {
     typealias Key = K
-    
-    let decoder: _RowDecoder
+
+    let decoder: InnerRowDecoder
     let row: Row
-    
-    fileprivate(set) var codingPath: [CodingKey]
-    
+
+    private(set) var codingPath: [CodingKey]
+
     var allKeys: [K] {
-        return row.columns.compactMap { Key(stringValue: $0) }
+        row.columns.compactMap { Key(stringValue: $0) }
     }
-    
-    fileprivate init(referencing decoder: _RowDecoder, wrapping row: Row) {
+
+    init(referencing decoder: InnerRowDecoder, wrapping row: Row) {
         self.decoder = decoder
         self.row = row
-        
+
         self.codingPath = decoder.codingPath
     }
-    
+
     func contains(_ key: K) -> Bool {
-        return row.columns.contains(key.stringValue)
+        row.columns.contains(key.stringValue)
     }
-    
+
     func decodeNil(forKey key: K) throws -> Bool {
-        return row.columnIsNull(key: key.stringValue)
+        row.columnIsNull(key: key.stringValue)
     }
-    
-    func decode(_ type: Bool.Type, forKey key: K) throws -> Bool {
-        return row[key.stringValue]
+
+    func decode(_: Bool.Type, forKey key: K) throws -> Bool {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: String.Type, forKey key: K) throws -> String {
-        return row[key.stringValue]
+
+    func decode(_: String.Type, forKey key: K) throws -> String {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: Double.Type, forKey key: K) throws -> Double {
-        return row[key.stringValue]
+
+    func decode(_: Double.Type, forKey key: K) throws -> Double {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: Float.Type, forKey key: K) throws -> Float {
-        return row[key.stringValue]
+
+    func decode(_: Float.Type, forKey key: K) throws -> Float {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: Int.Type, forKey key: K) throws -> Int {
-        return row[key.stringValue]
+
+    func decode(_: Int.Type, forKey key: K) throws -> Int {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: Int8.Type, forKey key: K) throws -> Int8 {
-        return row[key.stringValue]
+
+    func decode(_: Int8.Type, forKey key: K) throws -> Int8 {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: Int16.Type, forKey key: K) throws -> Int16 {
-        return row[key.stringValue]
+
+    func decode(_: Int16.Type, forKey key: K) throws -> Int16 {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: Int32.Type, forKey key: K) throws -> Int32 {
-        return row[key.stringValue]
+
+    func decode(_: Int32.Type, forKey key: K) throws -> Int32 {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: Int64.Type, forKey key: K) throws -> Int64 {
-        return row[key.stringValue]
+
+    func decode(_: Int64.Type, forKey key: K) throws -> Int64 {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: UInt.Type, forKey key: K) throws -> UInt {
-        return row[key.stringValue]
+
+    func decode(_: UInt.Type, forKey key: K) throws -> UInt {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: UInt8.Type, forKey key: K) throws -> UInt8 {
-        return row[key.stringValue]
+
+    func decode(_: UInt8.Type, forKey key: K) throws -> UInt8 {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: UInt16.Type, forKey key: K) throws -> UInt16 {
-        return row[key.stringValue]
+
+    func decode(_: UInt16.Type, forKey key: K) throws -> UInt16 {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: UInt32.Type, forKey key: K) throws -> UInt32 {
-        return row[key.stringValue]
+
+    func decode(_: UInt32.Type, forKey key: K) throws -> UInt32 {
+        row[key.stringValue]
     }
-    
-    func decode(_ type: UInt64.Type, forKey key: K) throws -> UInt64 {
+
+    func decode(_: UInt64.Type, forKey _: K) throws -> UInt64 {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "Decoding UInt64 is not supported"))
     }
-    
+
     func decode<T>(_ type: T.Type, forKey key: K) throws -> T where T : Decodable {
+        // swiftlint:disable:next legacy_objc_type
         if type == Data.self || type == NSData.self {
             let data: Data = row[key.stringValue]
 
             guard let decodableValue = data as? T else {
                 throw DecodingError.typeMismatch(type, DecodingError.Context(codingPath: codingPath, debugDescription: "Decoding \(key.stringValue) is not convertable to a Decodable"))
             }
-            
+
             return decodableValue
+        // swiftlint:disable:next legacy_objc_type
         } else if type == Date.self || type == NSDate.self {
             let date: Date = row[key.stringValue]
-            
+
             guard let decodableValue = date as? T else {
                 throw DecodingError.typeMismatch(type, DecodingError.Context(codingPath: codingPath, debugDescription: "Decoding \(key.stringValue) is not convertable to a Decodable"))
             }
-            
+
             return decodableValue
         } else {
             decoder.currentKeys.append(key)
             defer { decoder.currentKeys.removeLast() }
-            
+
             return try type.init(from: decoder)
         }
     }
-    
-    func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: K) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-        fatalError("Not Implemented")
+
+    func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type, forKey _: K) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+        throw RestructureError.error("nestedContainer Not Implemented")
     }
-    
-    func nestedUnkeyedContainer(forKey key: K) throws -> UnkeyedDecodingContainer {
-        fatalError("Not Implemented")
+
+    func nestedUnkeyedContainer(forKey _: K) throws -> UnkeyedDecodingContainer {
+        throw RestructureError.error("nestedUnkeyedContainer Not Implemented")
     }
-    
+
     func superDecoder() throws -> Decoder {
-        fatalError("Not Implemented")
+        throw RestructureError.error("superDecoder Not Implemented")
     }
-    
-    func superDecoder(forKey key: K) throws -> Decoder {
-        fatalError("Not Implemented")
+
+    func superDecoder(forKey _: K) throws -> Decoder {
+        throw RestructureError.error("superDecoder Not Implemented")
     }
-    
 }
 
-fileprivate struct _RowUnkeyedDecodingContainer: UnkeyedDecodingContainer {
-    private let decoder: _RowDecoder
+private struct InnerRowUnkeyedDecodingContainer: UnkeyedDecodingContainer {
+    private let decoder: InnerRowDecoder
     private let array: [Any]
-    
+
     var codingPath: [CodingKey]
-    
+
     var count: Int? {
-        return array.count
+        array.count
     }
-    
+
     var isAtEnd: Bool {
-        return self.currentIndex >= self.count!
+        guard let count else { return false }
+
+        return currentIndex >= count
     }
-    
+
     var currentIndex: Int
-    
-    fileprivate init(referencing decoder: _RowDecoder, wrapping rawData: Data) {
+
+    init(referencing decoder: InnerRowDecoder, wrapping rawData: Data) {
         self.decoder = decoder
         self.codingPath = decoder.codingPath
         self.currentIndex = 0
-        
+
         let array: Any
-        
+
         switch decoder.row.arrayStrategy {
         case .bplist:
             do {
@@ -305,19 +356,19 @@ fileprivate struct _RowUnkeyedDecodingContainer: UnkeyedDecodingContainer {
                 fatalError("Failed to deserialize JSON: \(error)")
             }
         }
-        
+
         guard let finalArray = array as? [Any] else {
             fatalError("Failed to convert final array")
         }
-        
+
         self.array = finalArray
     }
-    
+
     mutating func decodeNil() throws -> Bool {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         if array[currentIndex] is NSNull {
             currentIndex += 1
             return true
@@ -325,245 +376,246 @@ fileprivate struct _RowUnkeyedDecodingContainer: UnkeyedDecodingContainer {
             return false
         }
     }
-    
+
     mutating func decode(_ type: Bool.Type) throws -> Bool {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Bool else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: String.Type) throws -> String {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? String else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: Double.Type) throws -> Double {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Double else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: Float.Type) throws -> Float {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Float else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: Int.Type) throws -> Int {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Int else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: Int8.Type) throws -> Int8 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Int8 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: Int16.Type) throws -> Int16 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Int16 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: Int32.Type) throws -> Int32 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Int32 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: Int64.Type) throws -> Int64 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? Int64 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: UInt.Type) throws -> UInt {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? UInt else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: UInt8.Type) throws -> UInt8 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? UInt8 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: UInt16.Type) throws -> UInt16 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? UInt16 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: UInt32.Type) throws -> UInt32 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? UInt32 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode(_ type: UInt64.Type) throws -> UInt64 {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? UInt64 else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
+
     mutating func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
         guard !isAtEnd else {
             throw DecodingError.valueNotFound(Any?.self, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Unkeyed container is at end"))
         }
-        
+
         guard let value = array[currentIndex] as? T else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath + [_RowKey(intValue: currentIndex)], debugDescription: "Expected \(type) but found null instead."))
         }
-        
+
         currentIndex += 1
-        
+
         return value
     }
-    
-    mutating func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-        fatalError("Not Implemented")
+
+    mutating func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+        throw RestructureError.error("nestedContainer Not Implemented")
     }
-    
+
     mutating func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
-        fatalError("Not Implemented")
+        throw RestructureError.error("nestedUnkeyedContainer Not Implemented")
     }
-    
+
     mutating func superDecoder() throws -> Decoder {
-        fatalError("Not Implemented")
+        throw RestructureError.error("superDecoder Not Implemented")
     }
 }
 
-fileprivate struct _RowKey: CodingKey {
-    public var stringValue: String
-    public var intValue: Int?
-    
-    public init(stringValue: String) {
+private struct _RowKey: CodingKey {
+
+    var stringValue: String
+    var intValue: Int?
+
+    init(stringValue: String) {
         self.stringValue = stringValue
         self.intValue = nil
     }
-    
-    public init(intValue: Int) {
+
+    init(intValue: Int) {
         self.stringValue = "\(intValue)"
         self.intValue = intValue
     }
-    
-    public init(stringValue: String, intValue: Int) {
+
+    init(stringValue: String, intValue: Int) {
         self.stringValue = stringValue
         self.intValue = intValue
     }

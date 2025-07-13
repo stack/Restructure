@@ -2,7 +2,7 @@
 //  DateStrategy.swift
 //  Restructure
 //
-//  Created by Stephen H. Gerstacker on 11/4/18.
+//  Created by Stephen H. Gerstacker on 2018-11-04.
 //  SPDX-License-Identifier: MIT
 //
 
