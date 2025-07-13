@@ -129,10 +129,10 @@ Dates can be stored in the formats supported by SQLite. Typically this means:
 
 ```swift
 // Make all dates in Restructure julian
-restructure.arrayStrategy = .real
+restructure.dateStrategy = .real
 
 // Make a specific statement use epoch
-statement.arrayStrategy = .integer
+statement.dateStrategy = .integer
 
 // Get and fetch a date
 statement.bind(value: Date(), for: "date")
