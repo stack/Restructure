@@ -194,6 +194,8 @@ extension InnerStatementEncoder: SingleValueEncodingContainer {
 
 // MARK: - Encoding Containers
 
+// swiftlint:disable unneeded_throws_rethrows
+
 struct InnerStatementEncodingContainer<K : CodingKey> : KeyedEncodingContainerProtocol {
     typealias Key = K
 
@@ -422,3 +424,5 @@ struct InnerStatementEncodingContainer<K : CodingKey> : KeyedEncodingContainerPr
     }
     // swiftlint:enable unavailable_function
 }
+
+// swiftlint:enable unneeded_throws_rethrows

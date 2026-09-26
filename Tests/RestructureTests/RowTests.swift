@@ -686,6 +686,26 @@ struct RowTests {
         #expect(data1 == data2)
     }
 
+    @Test func uuid() throws {
+        try restructure.execute(query: "CREATE TABLE foo (a BLOB)")
+
+        let uuid1 = UUID(uuidString: "DE1661BB-4D7D-47C0-AF68-995B657BDCFA")!
+
+        let insertStatement = try restructure.prepare(query: "INSERT INTO foo (a) VALUES (:a)")
+        insertStatement.bind(value: uuid1, for: "a")
+        _ = insertStatement.step()
+
+        let selectStatement = try restructure.prepare(query: "SELECT a from foo LIMIT 1")
+
+        guard case let .row(row) = selectStatement.step() else {
+            Issue.record("Failed to fetch row")
+            return
+        }
+
+        let uuid2: UUID = try #require(row["a"])
+        #expect(uuid1 == uuid2)
+    }
+
     @Test func integerDate() throws {
         let now =  Date()
 

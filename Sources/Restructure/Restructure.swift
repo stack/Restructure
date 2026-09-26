@@ -174,7 +174,7 @@ public class Restructure {
     }
 
     private func registerFunctions() {
-        // swiftlint:disable multiline_arguments
+        // swiftlint:disable multiline_arguments multiline_call_arguments
         sqlite3_create_function(db, "UPPER", 1, SQLITE_UTF8, nil, { context, _, arguments in
             guard let args = arguments else {
                 sqlite3_result_error(context, "UPPER could not unwrap arguments", -1)
@@ -198,7 +198,7 @@ public class Restructure {
                 sqlite3_result_text(context, value, Int32(stringValue.utf8.count), SQLITE_TRANSIENT)
             }
         }, nil, nil)
-        // swiftlint:enable multiline_arguments
+        // swiftlint:enable multiline_arguments multiline_call_arguments
     }
 
     // MARK: - Querying

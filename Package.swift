@@ -1,11 +1,11 @@
-// swift-tools-version:6.1
+// swift-tools-version:6.4
 
 import PackageDescription
 
 let package = Package(
     name: "Restructure",
     platforms: [
-        .macOS(.v14), .iOS(.v17), .tvOS(.v17), .watchOS(.v9), .visionOS(.v2)
+        .macOS(.v26), .iOS(.v26), .tvOS(.v26), .watchOS(.v26), .visionOS(.v2)
     ],
     products: [
         .library(
@@ -14,9 +14,9 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
-        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.59.1")
+        .package(url: "https://github.com/apple/swift-numerics", from: "1.1.1"),
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.5.0"),
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.65.1")
     ],
     targets: [
         .target(

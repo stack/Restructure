@@ -122,6 +122,39 @@ struct StatementEncoderTests {
         #expect(row["b"] == "exámple óóßChloë")
     }
 
+    @Test func uuidEncodable() throws {
+        struct Foo: Encodable {
+            let a: Int64?
+            let e: UUID
+        }
+
+        let statement = try restructure.prepare(query: "INSERT INTO foo (e) values (:e)")
+
+        let id = UUID(uuidString: "DE1661BB-4D7D-47C0-AF68-995B657BDCFA")!
+        let foo = Foo(a: nil, e: id)
+
+        let encoder = StatementEncoder()
+        try encoder.encode(foo, to: statement)
+
+        var result = statement.step()
+
+        guard case .done = result else {
+            Issue.record("Failed to insert data")
+            return
+        }
+
+        let selectStatement = try restructure.prepare(query: "SELECT a, e FROM foo LIMIT 1")
+
+        result = selectStatement.step()
+
+        guard case let .row(row) = result else {
+            Issue.record("Failed to fetch row")
+            return
+        }
+
+        #expect(row["e"] == id)
+    }
+
     @Test func arrayEncodable() throws {
         struct Foo: Encodable {
             let a: Int64?

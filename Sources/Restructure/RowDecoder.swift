@@ -26,26 +26,27 @@ public class RowDecoder {
     /// - Parameter from: The Row to decode from.
     ///
     /// - Throws: `Error` if the decoding is not possible.
-    public func decode<T : Decodable>(_ type: T.Type, from row: Row) throws -> T {
+    public func decode<T: Decodable>(_ type: T.Type, from row: Row) throws -> T {
         let decoder = InnerRowDecoder(referencing: row)
 
         return try type.init(from: decoder)
     }
 }
 
-private class InnerRowDecoder : Decoder {
+private class InnerRowDecoder: Decoder {
     let row: Row
 
     private(set) var codingPath: [CodingKey]
     var currentKeys: [CodingKey] = []
 
-    var userInfo: [CodingUserInfoKey : Any] = [:]
+    var userInfo: [CodingUserInfoKey:Any] = [:]
 
     init(referencing row: Row, at codingPath: [CodingKey] = []) {
         self.codingPath = codingPath
         self.row = row
     }
 
+    // swiftlint:disable:next unneeded_throws_rethrows
     func container<Key>(keyedBy _: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
         let container = InnerRowKeyedDecodingContainer<Key>(referencing: self, wrapping: row)
         return KeyedDecodingContainer(container)
@@ -62,6 +63,7 @@ private class InnerRowDecoder : Decoder {
         return container
     }
 
+    // swiftlint:disable:next unneeded_throws_rethrows
     func singleValueContainer() throws -> SingleValueDecodingContainer {
         self
     }
@@ -213,6 +215,8 @@ private struct InnerRowKeyedDecodingContainer<K : CodingKey> : KeyedDecodingCont
         row.columns.contains(key.stringValue)
     }
 
+    // swiftlint:disable unneeded_throws_rethrows
+
     func decodeNil(forKey key: K) throws -> Bool {
         row.columnIsNull(key: key.stringValue)
     }
@@ -268,6 +272,8 @@ private struct InnerRowKeyedDecodingContainer<K : CodingKey> : KeyedDecodingCont
     func decode(_: UInt32.Type, forKey key: K) throws -> UInt32 {
         row[key.stringValue]
     }
+
+    // swiftlint:enable unneeded_throws_rethrows
 
     func decode(_: UInt64.Type, forKey _: K) throws -> UInt64 {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "Decoding UInt64 is not supported"))

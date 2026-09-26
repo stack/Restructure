@@ -169,6 +169,23 @@ extension Data: Structurable {
     }
 }
 
+extension UUID: Structurable {
+    public static func from(_ statement: Statement, at index: Int) -> UUID {
+        if let data = sqlite3_column_blob(statement.statement, Int32(index)) {
+            let rawUUID = data.load(as: uuid_t.self)
+            return UUID(uuid: rawUUID)
+        } else {
+            fatalError("Fetched non-null data was null")
+        }
+    }
+
+    public func bind(to statement: Statement, at index: Int) {
+        _ = withUnsafeBytes(of: uuid) { bytes in
+            sqlite3_bind_blob(statement.statement, Int32(index), bytes.baseAddress, 16, SQLITE_TRANSIENT)
+        }
+    }
+}
+
 extension Date: Structurable {
     public static func from(_ statement: Statement, at index: Int) -> Date {
         switch statement.dateStrategy {
